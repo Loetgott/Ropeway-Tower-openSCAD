@@ -1,13 +1,13 @@
 height = 500;
 angle = 20;
-draw_construction_helpers = true;
+draw_construction_helpers = false;
 
 dir = [0, height * sin(angle), height * cos(angle)];
 top_point = dir; //punkt oben in der Mitte
 cross_to_edge = cross([50,0,0], dir);
 vec_to_corner = [50,0,0] + ((cross_to_edge / norm(cross_to_edge)) * 38);
 
-if(draw_construction_helpers){
+if(draw_construction_helpers){ //show construction helping vectors
     color("red"){
         cylinder_from_point([0,0,0], dir,height, 2.5);  //height cylinder
         for (p = [a, b, c, d]) {
@@ -17,33 +17,55 @@ if(draw_construction_helpers){
     }
 }
 
+
 a = top_point + vec_to_corner;
 b = top_point + [-vec_to_corner.x, vec_to_corner.y, vec_to_corner.z];
 c = top_point + [-vec_to_corner.x, -vec_to_corner.y, -vec_to_corner.z];
 d = top_point + [vec_to_corner.x, -vec_to_corner.y, -vec_to_corner.z];
 
-for (p = [a, b, c, d]) {
-    color("blue")
-        cylinder_from_point(p, dir, 80, 2.5);
-}
+ground_vec_y = cross_to_edge / norm(cross_to_edge) * height * tan(11.6);
+ground_vec_x = [1,0,0] * height * tan(6.3);
+
+a_to_ground = -dir + ground_vec_y + ground_vec_x;
+b_to_ground = -dir + ground_vec_y - ground_vec_x;
+c_to_ground = -dir - ground_vec_y - ground_vec_x;
+d_to_ground = -dir - ground_vec_y + ground_vec_x;
+
+a_on_ground = intersect_with_xy(a, a_to_ground);
+b_on_ground = intersect_with_xy(b, b_to_ground);
+c_on_ground = intersect_with_xy(c, c_to_ground);
+d_on_ground = intersect_with_xy(d, d_to_ground);
+
 
 color("blue"){
+    for (p = [a, b, c, d]) {
+        cylinder_from_point(p, dir, 80, 2.5);
+    }
+    
     cylinder_between(a, b, 2.5);
     cylinder_between(a, d, 2.5);
     cylinder_between(b, c, 2.5);
     cylinder_between(d, c, 2.5);
+    
     cylinder_between(a + dir / norm(dir) * 80, b + dir / norm(dir) * 80, 2.5);
     cylinder_between(a + dir / norm(dir) * 80, d + dir / norm(dir) * 80, 2.5);
     cylinder_between(b + dir / norm(dir) * 80, c + dir / norm(dir) * 80, 2.5);
     cylinder_between(d + dir / norm(dir) * 80, c + dir / norm(dir) * 80, 2.5);
+    
+    cylinder_between(a, a_on_ground, 2.5);
+    cylinder_between(b, b_on_ground, 2.5);
+    cylinder_between(c, c_on_ground, 2.5);
+    cylinder_between(d, d_on_ground, 2.5);
 }
 
+function intersect_with_xy(p, v) = 
+    p + v * (-p.z / v.z); // Skaliere v, damit z=0
 
 module cylinder_from_point(p, dir, h, r, $fn=64) {
     d = dir / norm(dir);          // Richtungsvektor normieren
 
     axis  = cross([0,0,1], d);     // Rotationsachse
-    angle = acos(d.z);             // Rotationswinkel (Grad!)
+    angle = acos(d.z);             // Rotationswinkel
 
     translate(p)
         rotate(a = angle, v = axis)
