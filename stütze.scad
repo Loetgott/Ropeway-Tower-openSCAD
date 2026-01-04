@@ -1,5 +1,6 @@
 height = 500;
 angle = 20;
+floor_count = 2;
 draw_construction_helpers = false;
 
 dir = [0, height * sin(angle), height * cos(angle)];
@@ -58,6 +59,15 @@ color("blue"){
     cylinder_between(d, d_on_ground, 2.5);
 }
 
+color("green"){
+    cylinder_from_point(a_on_ground, [0, 0, 1], 5, 30);
+
+    pipe_from_point(a, a_to_ground, 35, 2.51, 5);
+    pipe_from_point(b, b_to_ground, 35, 2.51, 5);
+    pipe_from_point(c, c_to_ground, 35, 2.51, 5);
+    pipe_from_point(d, d_to_ground, 35, 2.51, 5);
+}
+
 function intersect_with_xy(p, v) = 
     p + v * (-p.z / v.z); // Skaliere v, damit z=0
 
@@ -83,4 +93,18 @@ module cylinder_between(p1, p2, r, $fn=64) {
     translate(p1)
         rotate(a = angle, v = axis)
             cylinder(h = h, r = r);
+}
+
+module pipe_from_point(p, dir, h, ir, or, $fn=64){
+    difference(){
+        cylinder_from_point(p, dir, h, or);
+        cylinder_from_point(p, dir, h, ir);
+    }
+}
+
+module pipe_between(p1, p2, ir, or, $fn=64){
+    difference(){
+        cylinder_between(p1, p2, or);
+        cylinder_between(p1, p2, ir);
+    }
 }

@@ -1,0 +1,11 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "Neue Parameter Liste1": {
+            "angle": "20",
+            "draw_construction_helpers": "true",
+            "floor_count": "2",
+            "height": "500"
+        }
+    }
+}
