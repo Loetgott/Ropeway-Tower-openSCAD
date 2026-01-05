@@ -28,10 +28,24 @@ d_on_ground = intersect_with_xy(d, d_to_ground);
 
 floor_height = norm((c_on_ground - c) / floor_count);
 
-points_on_a_to_ground = [ for (i = [1 : floor_count - 1])  a + (a_to_ground / norm(a_to_ground) * i * floor_height)];
-points_on_b_to_ground = [ for (i = [1 : floor_count - 1])  b + (b_to_ground / norm(b_to_ground) * i * floor_height)];
-points_on_c_to_ground = subdivide(c, c_on_ground, floor_count);
-points_on_d_to_ground = subdivide(d, d_on_ground, floor_count);
+subdivide_c_list = subdivide(c, c_on_ground, floor_count);
+subdivide_d_list = subdivide(d, d_on_ground, floor_count);
+
+points_on_a_to_ground = [a, for (i = [1 : floor_count - 1])  a + (a_to_ground / norm(a_to_ground) * i * floor_height), a_on_ground];
+points_on_b_to_ground = [b, for (i = [1 : floor_count - 1])  b + (b_to_ground / norm(b_to_ground) * i * floor_height), b_on_ground];
+points_on_c_to_ground = [c, for (i = [0 : len(subdivide_c_list) - 1]) subdivide_c_list[i], c_on_ground];
+points_on_d_to_ground = [d, for (i = [0 : len(subdivide_d_list) - 1]) subdivide_d_list[i], d_on_ground];
+
+
+middle_points_on_a_to_ground = [for (i = [1 : floor_count - 1])  a + (a_to_ground / norm(a_to_ground) * i * floor_height) - 0.5 * a_to_ground / norm(a_to_ground) * floor_height, a_on_ground];
+middle_points_on_b_to_ground = [for (i = [1 : floor_count - 1])  b + (b_to_ground / norm(b_to_ground) * i * floor_height) - 0.5 * b_to_ground / norm(b_to_ground) * floor_height, b_on_ground];
+middle_points_on_c_to_ground = [for (i = [1 : floor_count - 1])  c + (c_to_ground / norm(c_to_ground) * i * floor_height) - 0.5 * c_to_ground / norm(c_to_ground) * floor_height, c_on_ground];
+middle_points_on_d_to_ground = [for (i = [1 : floor_count - 1])  d + (d_to_ground / norm(d_to_ground) * i * floor_height) - 0.5 * d_to_ground / norm(d_to_ground) * floor_height, d_on_ground];
+
+middle_points_a_b = [for (i = [0 : floor_count - 1]) midpoint(points_on_a_to_ground[i], points_on_b_to_ground[i])];
+middle_points_b_c = [for (i = [0 : floor_count - 1]) midpoint(points_on_b_to_ground[i], points_on_c_to_ground[i])];
+middle_points_c_d = [for (i = [0 : floor_count - 1]) midpoint(points_on_c_to_ground[i], points_on_d_to_ground[i])];
+middle_points_d_a = [for (i = [0 : floor_count - 1]) midpoint(points_on_d_to_ground[i], points_on_a_to_ground[i])];
 
 if(draw_construction_helpers){ //show construction helping vectors
     color("red"){
@@ -40,26 +54,29 @@ if(draw_construction_helpers){ //show construction helping vectors
             cylinder_between(top_point, p, 2.5);        //cross for a,b,c,d 
         }       
         
-        for (p = points_on_a_to_ground) {
-            translate(p)
-                sphere(r = 8);
+        // Alle Punkt-Arrays, zusammengefasst mit gewünschtem Radius
+        point_groups = [
+            [points_on_a_to_ground, 8],
+            [points_on_b_to_ground, 8],
+            [points_on_c_to_ground, 8],
+            [points_on_d_to_ground, 8],
+            [middle_points_on_a_to_ground, 6],
+            [middle_points_on_b_to_ground, 6],
+            [middle_points_on_c_to_ground, 6],
+            [middle_points_on_d_to_ground, 6],
+            [middle_points_a_b, 6],
+            [middle_points_b_c, 6],
+            [middle_points_c_d, 6],
+            [middle_points_d_a, 6]
+        ];
+
+        // Schleife über die Gruppen
+        for (grp = point_groups) {
+            points = grp[0];
+            r = grp[1];
+            for (p = points)
+                translate(p) sphere(r = r);
         }
-        
-        for (p = points_on_b_to_ground) {
-            translate(p)
-                sphere(r = 8);
-        }
-        
-        for (p = points_on_c_to_ground) {
-            translate(p)
-                sphere(r = 8);
-        }
-       
-        for (p = points_on_d_to_ground) {
-            translate(p)
-                sphere(r = 8);
-        }
-        
     }
 }
 
@@ -82,24 +99,68 @@ color("blue"){
     cylinder_between(b, b_on_ground, 2.5);
     cylinder_between(c, c_on_ground, 2.5);
     cylinder_between(d, d_on_ground, 2.5);
+    
+    for (i = [0 : len(points_on_a_to_ground) - 2]) {
+        cylinder_between(points_on_a_to_ground[i], points_on_b_to_ground[i], 2.5);
+        cylinder_between(points_on_b_to_ground[i], points_on_c_to_ground[i], 2.5);
+        cylinder_between(points_on_c_to_ground[i], points_on_d_to_ground[i], 2.5);
+        cylinder_between(points_on_d_to_ground[i], points_on_a_to_ground[i], 2.5);
+    }
+    
+    cylinder_between(middle_points_a_b[0], middle_points_on_a_to_ground[0], 1.5);
+    cylinder_between(middle_points_a_b[0], middle_points_on_b_to_ground[0], 1.5);
+    cylinder_between(middle_points_b_c[0], middle_points_on_b_to_ground[0], 1.5);
+    cylinder_between(middle_points_b_c[0], middle_points_on_c_to_ground[0], 1.5);
+    cylinder_between(middle_points_c_d[0], middle_points_on_c_to_ground[0], 1.5);
+    cylinder_between(middle_points_c_d[0], middle_points_on_d_to_ground[0], 1.5);
+    cylinder_between(middle_points_d_a[0], middle_points_on_d_to_ground[0], 1.5);
+    cylinder_between(middle_points_d_a[0], middle_points_on_a_to_ground[0], 1.5);
+    
+    for (i = [1 : floor_count - 1]){
+        cylinder_between(middle_points_a_b[i], middle_points_on_a_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_a_b[i], middle_points_on_b_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_a_b[i], middle_points_on_a_to_ground[i], 1.5);
+        cylinder_between(middle_points_a_b[i], middle_points_on_b_to_ground[i], 1.5);
+        
+        cylinder_between(middle_points_b_c[i], middle_points_on_b_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_b_c[i], middle_points_on_c_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_b_c[i], middle_points_on_b_to_ground[i], 1.5);
+        cylinder_between(middle_points_b_c[i], middle_points_on_c_to_ground[i], 1.5);
+        
+        cylinder_between(middle_points_c_d[i], middle_points_on_c_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_d_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_c_to_ground[i], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_d_to_ground[i], 1.5);
+        
+        cylinder_between(middle_points_d_a[i], middle_points_on_d_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i - 1], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_d_to_ground[i], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i], 1.5);
+    }
 }
 
 color("green"){
-    cylinder_from_point(a_on_ground, [0, 0, 1], 5, 30);
+    //cylinder_from_point(a_on_ground, [0, 0, 1], 5, 30);
 
-    pipe_from_point(a, a_to_ground, 35, 2.51, 5);
-    pipe_from_point(b, b_to_ground, 35, 2.51, 5);
-    pipe_from_point(c, c_to_ground, 35, 2.51, 5);
-    pipe_from_point(d, d_to_ground, 35, 2.51, 5);
+    pipe_from_point(a, a_to_ground, 25, 2.51, 5);
+    pipe_from_point(b, b_to_ground, 25, 2.51, 5);
+    pipe_from_point(c, c_to_ground, 25, 2.51, 5);
+    pipe_from_point(d, d_to_ground, 25, 2.51, 5);
 }
 
+//gibt den Schnittpunkt eines Vektors mit der xy-Ebene zurück
 function intersect_with_xy(p, v) = 
     p + v * (-p.z / v.z); // Skaliere v, damit z=0
-    
+
+//gibt eine Liste von regelmäßig verteilten Punkten auf einem Vektor zurück
 function subdivide(p_top, p_bottom, n) =
     [ for (i = [1 : n - 1])
-        p_top + (p_bottom - p_top) * (i / n)
-    ];
+        p_top + (p_bottom - p_top) * (i / n)];
+    
+// Gibt den Mittelpunkt zwischen zwei Punkten zurück
+function midpoint(p1, p2) = 
+    [(p1[0] + p2[0])/2, (p1[1] + p2[1])/2, (p1[2] + p2[2])/2];
+
 
 module cylinder_from_point(p, dir, h, r, $fn=64) {
     d = dir / norm(dir);          // Richtungsvektor normieren

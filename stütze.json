@@ -8,10 +8,22 @@
             "height": "500"
         },
         "Neue Parameter Liste2": {
-            "angle": "0",
+            "angle": "20",
             "draw_construction_helpers": "true",
             "floor_count": "5",
             "height": "1000"
+        },
+        "Neue Parameter Liste3": {
+            "angle": "20",
+            "draw_construction_helpers": "true",
+            "floor_count": "4",
+            "height": "500"
+        },
+        "Neue Parameter Liste4": {
+            "angle": "10",
+            "draw_construction_helpers": "false",
+            "floor_count": "4",
+            "height": "600"
         }
     }
 }
