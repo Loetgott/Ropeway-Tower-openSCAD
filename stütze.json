@@ -6,6 +6,12 @@
             "draw_construction_helpers": "true",
             "floor_count": "2",
             "height": "500"
+        },
+        "Neue Parameter Liste2": {
+            "angle": "0",
+            "draw_construction_helpers": "true",
+            "floor_count": "5",
+            "height": "1000"
         }
     }
 }

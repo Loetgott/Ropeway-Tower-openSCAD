@@ -1,23 +1,12 @@
 height = 500;
 angle = 20;
-floor_count = 2;
+floor_count = 3;
 draw_construction_helpers = false;
 
 dir = [0, height * sin(angle), height * cos(angle)];
 top_point = dir; //punkt oben in der Mitte
 cross_to_edge = cross([50,0,0], dir);
 vec_to_corner = [50,0,0] + ((cross_to_edge / norm(cross_to_edge)) * 38);
-
-if(draw_construction_helpers){ //show construction helping vectors
-    color("red"){
-        cylinder_from_point([0,0,0], dir,height, 2.5);  //height cylinder
-        for (p = [a, b, c, d]) {
-            cylinder_between(top_point, p, 2.5);        //cross for a,b,c,d 
-        }        
-        
-    }
-}
-
 
 a = top_point + vec_to_corner;
 b = top_point + [-vec_to_corner.x, vec_to_corner.y, vec_to_corner.z];
@@ -37,6 +26,42 @@ b_on_ground = intersect_with_xy(b, b_to_ground);
 c_on_ground = intersect_with_xy(c, c_to_ground);
 d_on_ground = intersect_with_xy(d, d_to_ground);
 
+floor_height = norm((c_on_ground - c) / floor_count);
+
+points_on_a_to_ground = [ for (i = [1 : floor_count - 1])  a + (a_to_ground / norm(a_to_ground) * i * floor_height)];
+points_on_b_to_ground = [ for (i = [1 : floor_count - 1])  b + (b_to_ground / norm(b_to_ground) * i * floor_height)];
+points_on_c_to_ground = subdivide(c, c_on_ground, floor_count);
+points_on_d_to_ground = subdivide(d, d_on_ground, floor_count);
+
+if(draw_construction_helpers){ //show construction helping vectors
+    color("red"){
+        cylinder_from_point([0,0,0], dir,height, 2.5);  //height cylinder
+        for (p = [a, b, c, d]) {
+            cylinder_between(top_point, p, 2.5);        //cross for a,b,c,d 
+        }       
+        
+        for (p = points_on_a_to_ground) {
+            translate(p)
+                sphere(r = 8);
+        }
+        
+        for (p = points_on_b_to_ground) {
+            translate(p)
+                sphere(r = 8);
+        }
+        
+        for (p = points_on_c_to_ground) {
+            translate(p)
+                sphere(r = 8);
+        }
+       
+        for (p = points_on_d_to_ground) {
+            translate(p)
+                sphere(r = 8);
+        }
+        
+    }
+}
 
 color("blue"){
     for (p = [a, b, c, d]) {
@@ -70,6 +95,11 @@ color("green"){
 
 function intersect_with_xy(p, v) = 
     p + v * (-p.z / v.z); // Skaliere v, damit z=0
+    
+function subdivide(p_top, p_bottom, n) =
+    [ for (i = [1 : n - 1])
+        p_top + (p_bottom - p_top) * (i / n)
+    ];
 
 module cylinder_from_point(p, dir, h, r, $fn=64) {
     d = dir / norm(dir);          // Richtungsvektor normieren
@@ -81,7 +111,6 @@ module cylinder_from_point(p, dir, h, r, $fn=64) {
         rotate(a = angle, v = axis)
             cylinder(h = h, r = r);
 }
-
 
 module cylinder_between(p1, p2, r, $fn=64) {
     v = p2 - p1;
