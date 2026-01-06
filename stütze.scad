@@ -3,7 +3,7 @@ angle = 20;
 angle_on_top = 51;
 floor_count = 3;
 draw_construction_helpers = false;
-draw_screws = true;
+draw_rods = true;
 
 function dot(a, b) = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 
@@ -24,6 +24,8 @@ function rotate_vec(v, axis, angle) =
     v*cos(angle)
   + cross(axis, v)*sin(angle)
   + axis * dot(axis, v) * (1 - cos(angle));
+  
+function normalize(v) = v / norm(v);   
 
 dir = [0, height * sin(angle), height * cos(angle)];
 top_point = dir; //punkt oben in der Mitte
@@ -107,7 +109,7 @@ if(draw_construction_helpers){ //show construction helping vectors
     }
 }
 
-if(draw_screws){
+if(draw_rods){
 color("blue"){
     for (p = [a, b, c, d]) {
         cylinder_from_point(p, dir, 80, 2.5);
@@ -282,6 +284,11 @@ color("green"){
         pipe_from_point(middle_points_d_a[i], middle_points_on_d_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
         pipe_from_point(middle_points_d_a[i], middle_points_on_a_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
     }
+    
+    linear_extrude(height = 3, slices = 10)
+        polygon(points = poly2d);
+}
+
 }
 
 module cylinder_from_point(p, dir, h, r, $fn=64) {
