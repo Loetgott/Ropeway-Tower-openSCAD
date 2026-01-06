@@ -24,6 +24,21 @@
             "draw_construction_helpers": "false",
             "floor_count": "4",
             "height": "600"
+        },
+        "Neue Parameter Liste5": {
+            "angle": "15",
+            "draw_construction_helpers": "false",
+            "draw_screws": "true",
+            "floor_count": "3",
+            "height": "500"
+        },
+        "Neue Parameter Liste6": {
+            "angle": "20",
+            "angle_on_top": "51",
+            "draw_construction_helpers": "false",
+            "draw_screws": "true",
+            "floor_count": "3",
+            "height": "500"
         }
     }
 }
