@@ -25,7 +25,10 @@ function rotate_vec(v, axis, angle) =
   + cross(axis, v)*sin(angle)
   + axis * dot(axis, v) * (1 - cos(angle));
   
-function normalize(v) = v / norm(v);   
+function normalize(v) = v / norm(v);
+
+function angle_between(a,b) =
+    acos( dot(a,b) / (norm(a)*norm(b)) );
 
 dir = [0, height * sin(angle), height * cos(angle)];
 top_point = dir; //punkt oben in der Mitte
@@ -285,9 +288,13 @@ color("green"){
         pipe_from_point(middle_points_d_a[i], middle_points_on_a_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
     }
     
-    linear_extrude(height = 3, slices = 10)
-        polygon(points = poly2d);
-}
+    angle_to_middle = angle_between(a_to_ground, points_on_d_to_ground[1] - points_on_a_to_ground[1]);
+    
+    translate([points_on_a_to_ground[1].x, points_on_a_to_ground[1].y, points_on_a_to_ground[1].z])
+    rotate([-angle - 11.6, 0, 0])
+    rotate([0, 90 - 6.4, 0])
+        linear_extrude(height = 3, center = true)
+            polygon(points = [[25, 0], [cos(angle_to_middle) * 25, sin(angle_to_middle) * 22], [-22, 0]]);
 
 }
 

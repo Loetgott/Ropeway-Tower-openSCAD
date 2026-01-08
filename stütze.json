@@ -38,6 +38,14 @@
             "draw_rods": "false",
             "floor_count": "3",
             "height": "500"
+        },
+        "Neue Parameter Liste7": {
+            "angle": "9",
+            "angle_on_top": "51",
+            "draw_construction_helpers": "false",
+            "draw_rods": "true",
+            "floor_count": "3",
+            "height": "600"
         }
     }
 }
