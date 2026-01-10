@@ -1,9 +1,12 @@
-height = 500;
-angle = 20;
+height = 600;
+angle = 15;
 angle_on_top = 51;
 floor_count = 3;
 draw_construction_helpers = false;
 draw_rods = true;
+
+big_rod_diameter = 5;
+small_rod_diameter = 3;
 
 function dot(a, b) = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 
@@ -114,6 +117,229 @@ if(draw_construction_helpers){ //show construction helping vectors
 
 if(draw_rods){
 color("blue"){
+    threaded_rods();
+}}
+
+color("green"){
+    //Oberstes "einfaches" Stockwerk
+    for(i = [a, b, c, d]){
+        pipe_from_point(i, dir, 25, 2.51, 5);
+    }
+    
+    pipe_from_point(a, a_to_front, 20, 2.51, 5);
+    pipe_from_point(b, b_to_front, 20, 2.51, 5);
+    pipe_from_point(c, c_to_front, 20, 2.51, 5);
+    pipe_from_point(d, d_to_front, 20, 2.51, 5);
+    
+    //Main connectors
+    for(i = [1 : floor_count - 1]) {
+        main_connector_a(points_on_a_to_ground[i], a_to_ground, points_on_d_to_ground[i]);
+        
+        mirror([1, 0, 0])
+            main_connector_a(points_on_a_to_ground[i], a_to_ground, points_on_d_to_ground[i]);
+            
+        mirror(cross(dir, [1, 0, 0]))
+            main_connector_a(points_on_a_to_ground[i], a_to_ground, points_on_d_to_ground[i]);
+            
+        mirror([1, 0, 0])
+            mirror(cross(dir, [1, 0, 0]))
+                main_connector_a(points_on_a_to_ground[i], a_to_ground, points_on_d_to_ground[i]);
+    }
+    
+    middle_points_to_ground = [
+        middle_points_on_a_to_ground,
+        middle_points_on_b_to_ground,
+        middle_points_on_c_to_ground,
+        middle_points_on_d_to_ground
+    ];
+
+    horizontal_middle_points = [
+        middle_points_a_b,
+        middle_points_b_c,
+        middle_points_c_d,
+        middle_points_d_a
+    ];
+
+    // horizontal middle connectors    
+    /*for (i = [0 : len(horizontal_middle_points) - 1]) {
+
+        next_i = (i + 1) % len(horizontal_middle_points);
+
+        for (ii = [0 : len(horizontal_middle_points[i]) - 1]) {
+            horizontal_middle_connector(
+                horizontal_middle_points[i][ii],
+                (i % 2 == 1)
+                    ? cross(dir, [1, 0, 0])
+                    : [1, 0, 0],
+                middle_points_to_ground[i][ii],
+                middle_points_to_ground[i][ii + 1],
+                middle_points_to_ground[next_i][ii],
+                middle_points_to_ground[next_i][ii + 1]
+            );
+        }
+    }*/
+
+    
+    /*for (i = [0 : floor_count - 2]) {
+        pipe_from_point(middle_points_on_a_to_ground[i], - a_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_a_to_ground[i], a_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_a_b[i] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_a_b[i + 1] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_d_a[i] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_d_a[i + 1] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_b_to_ground[i], - b_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_b_to_ground[i], b_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_a_b[i] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_a_b[i + 1] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_b_c[i] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_b_c[i + 1] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_c_to_ground[i], - c_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_c_to_ground[i], c_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_b_c[i] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_b_c[i + 1] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_c_d[i] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_c_d[i + 1] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_d_to_ground[i], - d_to_ground, 20, 2.51, 5);        
+        pipe_from_point(middle_points_on_d_to_ground[i], d_to_ground, 20, 2.51, 5);
+        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_c_d[i] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_c_d[i + 1] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_d_a[i] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_d_a[i + 1] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
+    }*/
+    
+    /*for (i = [0 : floor_count - 1]) {
+        pipe_from_point(middle_points_a_b[i], points_on_a_to_ground[i] - middle_points_a_b[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_a_b[i], points_on_b_to_ground[i] - middle_points_a_b[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_a_b[i], middle_points_on_a_to_ground[i] - middle_points_a_b[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_a_b[i], middle_points_on_b_to_ground[i] - middle_points_a_b[i], 20, 1.4, 3);
+        
+        pipe_from_point(middle_points_b_c[i], points_on_b_to_ground[i] - middle_points_b_c[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_b_c[i], points_on_c_to_ground[i] - middle_points_b_c[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_b_c[i], middle_points_on_b_to_ground[i] - middle_points_b_c[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_b_c[i], middle_points_on_c_to_ground[i] - middle_points_b_c[i], 20, 1.4, 3);
+        
+        pipe_from_point(middle_points_c_d[i], points_on_c_to_ground[i] - middle_points_c_d[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_c_d[i], points_on_d_to_ground[i] - middle_points_c_d[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_c_d[i], middle_points_on_c_to_ground[i] - middle_points_c_d[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_c_d[i], middle_points_on_d_to_ground[i] - middle_points_c_d[i], 20, 1.4, 3);
+        
+        pipe_from_point(middle_points_d_a[i], points_on_d_to_ground[i] - middle_points_d_a[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_d_a[i], points_on_a_to_ground[i] - middle_points_d_a[i], 20, 2.51, 5);
+        pipe_from_point(middle_points_d_a[i], middle_points_on_d_to_ground[i] - middle_points_d_a[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_d_a[i], middle_points_on_a_to_ground[i] - middle_points_d_a[i], 20, 1.4, 3);
+    }*/
+    
+    /*for (i = [1 : floor_count - 1]){
+        pipe_from_point(middle_points_a_b[i], middle_points_on_a_to_ground[i - 1] - middle_points_a_b[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_a_b[i], middle_points_on_b_to_ground[i - 1] - middle_points_a_b[i], 20, 1.4, 3);
+        
+        pipe_from_point(middle_points_b_c[i], middle_points_on_b_to_ground[i - 1] - middle_points_b_c[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_b_c[i], middle_points_on_c_to_ground[i - 1] - middle_points_b_c[i], 20, 1.4, 3);
+        
+        pipe_from_point(middle_points_c_d[i], middle_points_on_c_to_ground[i - 1] - middle_points_c_d[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_c_d[i], middle_points_on_d_to_ground[i - 1] - middle_points_c_d[i], 20, 1.4, 3);
+        
+        pipe_from_point(middle_points_d_a[i], middle_points_on_d_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
+        pipe_from_point(middle_points_d_a[i], middle_points_on_a_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
+    }*/
+}
+
+module vertical_middle_connector(origin, vec_to_ground, a, b,c ,d){
+    pipe_from_point(origin, vec_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(origin, -vec_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    
+    if(a != undef){
+        pipe_from_point(origin, a - origin, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+    
+    if(b != undef){
+        pipe_from_point(origin, origin - b, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+    
+    if(c != undef){
+        pipe_from_point(origin, c - origin, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+    
+    if(d != undef){
+        pipe_from_point(origin, origin - d, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+}
+
+module horizontal_middle_connector(origin, horizont_vec, a, b, c, d) {
+    pipe_from_point(origin, horizont_vec, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(origin, -horizont_vec, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    
+    if(a != undef){
+        pipe_from_point(origin, a - origin, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+    
+    if(b != undef){
+        pipe_from_point(origin, origin - b, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+    
+    if(c != undef){
+        pipe_from_point(origin, c - origin, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+    
+    if(d != undef){
+        pipe_from_point(origin, origin - d, 20, small_rod_diameter / 2, small_rod_diameter);
+    }
+}
+
+module main_connector_a(origin, vec_to_ground, horizontal_connector) {
+    difference() {
+        pipe_from_point(origin - normalize(vec_to_ground) * 20, vec_to_ground, 40, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+        cylinder_from_point(origin - [20, 0, 0], [1, 0, 0], 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin, horizontal_connector - origin, 30, big_rod_diameter / 2 - 0.4);
+    }
+    
+    difference() {
+        pipe_between(origin - [20, 0, 0], origin + [6, 0, 0], big_rod_diameter / 2 + 0.2, big_rod_diameter);
+        cylinder_from_point(origin - normalize(vec_to_ground) * 30, vec_to_ground, 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin - [20, 0, 0], [1, 0, 0], 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin, horizontal_connector - origin, 30, big_rod_diameter / 2 - 0.4);
+    }
+    
+    difference() {
+        pipe_from_point(origin, horizontal_connector - origin, 20, big_rod_diameter / 2 - 0.4, big_rod_diameter);
+        cylinder_from_point(origin - normalize(vec_to_ground) * 30, vec_to_ground, 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin - [20, 0, 0], [1, 0, 0], 60, big_rod_diameter / 2 + 0.2);
+    }
+        
+    angle_to_middle_y = angle_between(a_to_ground, horizontal_connector - origin);
+    
+    difference(){
+        translate(origin)
+        rotate([-angle - 11.6, 0, 0])
+        rotate([0, 90 - 6.4, 0])
+        linear_extrude(height = 3, center = true)
+        polygon(points = [[25, 0], [cos(angle_to_middle_y) * 25, sin(angle_to_middle_y) * 22], [-22, 0]]);
+        cylinder_from_point(origin - normalize(vec_to_ground) * 30, vec_to_ground, 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin - [25, 0, 0], [1, 0, 0], 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin, horizontal_connector - origin, 30, big_rod_diameter / 2 - 0.4);
+        cylinder_from_point(origin - normalize(vec_to_ground) * 20, -vec_to_ground, 60, big_rod_diameter * 2);
+        cylinder_from_point(origin + normalize(vec_to_ground) * 20, vec_to_ground, 60, big_rod_diameter * 2);
+        cylinder_from_point(origin + normalize(horizontal_connector - origin) * 20, horizontal_connector - origin, 20, big_rod_diameter * 2);
+    }
+    
+    angle_to_middle_x = angle_between(a_to_ground, [1, 0, 0]);
+    
+    difference() {
+        translate(origin)
+        rotate([-90 - 11.6 - angle, 0, 0])
+        rotate([0, 0, -6.4])
+        linear_extrude(height = 3, center = true)
+        polygon(points = [[0, 25], [-sin(angle_to_middle_y) * 22, cos(angle_to_middle_y) * 20], [0, -22]]);
+        cylinder_from_point(origin - normalize(vec_to_ground) * 30, vec_to_ground, 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin - [20, 0, 0], [1, 0, 0], 60, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(origin - normalize(vec_to_ground) * 20, -vec_to_ground, 60, big_rod_diameter * 2);
+        cylinder_from_point(origin - horizontal_connector * 20, horizontal_connector, 60, big_rod_diameter * 2);
+        cylinder_from_point(origin + normalize(vec_to_ground) * 20, vec_to_ground, 60, big_rod_diameter * 2);
+        cylinder_from_point(origin - [20, 0, 0], -[1, 0, 0], 60, big_rod_diameter * 2);
+    }
+}
+
+module threaded_rods(){
     for (p = [a, b, c, d]) {
         cylinder_from_point(p, dir, 80, 2.5);
     }
@@ -175,127 +401,6 @@ color("blue"){
         cylinder_between(middle_points_d_a[i], middle_points_on_d_to_ground[i], 1.5);
         cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i], 1.5);
     }
-}}
-
-color("green"){
-    //Oberstes "einfaches" Stockwerk
-    for(i = [a, b, c, d]){
-        pipe_from_point(i, dir, 25, 2.51, 5);
-    }
-    
-    pipe_from_point(a, a_to_front, 20, 2.51, 5);
-    pipe_from_point(b, b_to_front, 20, 2.51, 5);
-    pipe_from_point(c, c_to_front, 20, 2.51, 5);
-    pipe_from_point(d, d_to_front, 20, 2.51, 5);
-    
-    //alle weiteren doppelten Stockwerke    
-    for (i = [1 : floor_count - 1]) {
-        pipe_from_point(points_on_a_to_ground[i], - a_to_ground, 20, 2.51, 5);
-        pipe_from_point(points_on_b_to_ground[i], - b_to_ground, 20, 2.51, 5);
-        pipe_from_point(points_on_c_to_ground[i], - c_to_ground, 20, 2.51, 5);
-        pipe_from_point(points_on_d_to_ground[i], - d_to_ground, 20, 2.51, 5);
-    }
-    
-    for (i = [0 : floor_count - 1]) {
-        pipe_from_point(points_on_a_to_ground[i], -[1, 0, 0], 20, 2.51, 5);
-        pipe_from_point(points_on_b_to_ground[i], [1, 0, 0], 20, 2.51, 5);
-        pipe_from_point(points_on_c_to_ground[i], [1, 0, 0], 20, 2.51, 5);
-        pipe_from_point(points_on_d_to_ground[i], -[1, 0, 0], 20, 2.51, 5);
-        pipe_from_point(points_on_a_to_ground[i], [1, 0, 0], 6, 2.51, 5);
-        pipe_from_point(points_on_b_to_ground[i], -[1, 0, 0], 6, 2.51, 5);
-        pipe_from_point(points_on_c_to_ground[i], -[1, 0, 0], 6, 2.51, 5);
-        pipe_from_point(points_on_d_to_ground[i], [1, 0, 0], 6, 2.51, 5);
-    }
-    
-    for (i = [0 : floor_count - 1]) {
-        pipe_from_point(points_on_a_to_ground[i], a_to_ground, 20, 2.51, 5);
-        pipe_from_point(points_on_b_to_ground[i], b_to_ground, 20, 2.51, 5);
-        pipe_from_point(points_on_c_to_ground[i], c_to_ground, 20, 2.51, 5);
-        pipe_from_point(points_on_d_to_ground[i], d_to_ground, 20, 2.51, 5);
-    }
-    
-    for (i = [0 : floor_count - 1]) {
-        pipe_from_point(points_on_a_to_ground[i], points_on_d_to_ground[i] - points_on_a_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_b_to_ground[i], points_on_a_to_ground[i] - points_on_b_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_c_to_ground[i], points_on_b_to_ground[i] - points_on_c_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_d_to_ground[i], points_on_c_to_ground[i] - points_on_d_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_a_to_ground[i], points_on_b_to_ground[i] - points_on_a_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_b_to_ground[i], points_on_c_to_ground[i] - points_on_b_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_c_to_ground[i], points_on_d_to_ground[i] - points_on_c_to_ground[i], 20, 2.4, 5);
-        pipe_from_point(points_on_d_to_ground[i], points_on_a_to_ground[i] - points_on_d_to_ground[i], 20, 2.4, 5);
-    }
-    
-    for (i = [0 : floor_count - 2]) {
-        pipe_from_point(middle_points_on_a_to_ground[i], - a_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_a_to_ground[i], a_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_a_b[i] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_a_b[i + 1] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_d_a[i] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_a_to_ground[i], middle_points_d_a[i + 1] - middle_points_on_a_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_b_to_ground[i], - b_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_b_to_ground[i], b_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_a_b[i] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_a_b[i + 1] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_b_c[i] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_b_to_ground[i], middle_points_b_c[i + 1] - middle_points_on_b_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_c_to_ground[i], - c_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_c_to_ground[i], c_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_b_c[i] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_b_c[i + 1] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_c_d[i] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_c_to_ground[i], middle_points_c_d[i + 1] - middle_points_on_c_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_d_to_ground[i], - d_to_ground, 20, 2.51, 5);        
-        pipe_from_point(middle_points_on_d_to_ground[i], d_to_ground, 20, 2.51, 5);
-        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_c_d[i] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_c_d[i + 1] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_d_a[i] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_on_d_to_ground[i], middle_points_d_a[i + 1] - middle_points_on_d_to_ground[i], 20, 1.4, 3);
-    }
-    
-    for (i = [0 : floor_count - 1]) {
-        pipe_from_point(middle_points_a_b[i], points_on_a_to_ground[i] - middle_points_a_b[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_a_b[i], points_on_b_to_ground[i] - middle_points_a_b[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_a_b[i], middle_points_on_a_to_ground[i] - middle_points_a_b[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_a_b[i], middle_points_on_b_to_ground[i] - middle_points_a_b[i], 20, 1.4, 3);
-        
-        pipe_from_point(middle_points_b_c[i], points_on_b_to_ground[i] - middle_points_b_c[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_b_c[i], points_on_c_to_ground[i] - middle_points_b_c[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_b_c[i], middle_points_on_b_to_ground[i] - middle_points_b_c[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_b_c[i], middle_points_on_c_to_ground[i] - middle_points_b_c[i], 20, 1.4, 3);
-        
-        pipe_from_point(middle_points_c_d[i], points_on_c_to_ground[i] - middle_points_c_d[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_c_d[i], points_on_d_to_ground[i] - middle_points_c_d[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_c_d[i], middle_points_on_c_to_ground[i] - middle_points_c_d[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_c_d[i], middle_points_on_d_to_ground[i] - middle_points_c_d[i], 20, 1.4, 3);
-        
-        pipe_from_point(middle_points_d_a[i], points_on_d_to_ground[i] - middle_points_d_a[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_d_a[i], points_on_a_to_ground[i] - middle_points_d_a[i], 20, 2.51, 5);
-        pipe_from_point(middle_points_d_a[i], middle_points_on_d_to_ground[i] - middle_points_d_a[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_d_a[i], middle_points_on_a_to_ground[i] - middle_points_d_a[i], 20, 1.4, 3);
-    }
-    
-    for (i = [1 : floor_count - 1]){
-        pipe_from_point(middle_points_a_b[i], middle_points_on_a_to_ground[i - 1] - middle_points_a_b[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_a_b[i], middle_points_on_b_to_ground[i - 1] - middle_points_a_b[i], 20, 1.4, 3);
-        
-        pipe_from_point(middle_points_b_c[i], middle_points_on_b_to_ground[i - 1] - middle_points_b_c[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_b_c[i], middle_points_on_c_to_ground[i - 1] - middle_points_b_c[i], 20, 1.4, 3);
-        
-        pipe_from_point(middle_points_c_d[i], middle_points_on_c_to_ground[i - 1] - middle_points_c_d[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_c_d[i], middle_points_on_d_to_ground[i - 1] - middle_points_c_d[i], 20, 1.4, 3);
-        
-        pipe_from_point(middle_points_d_a[i], middle_points_on_d_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
-        pipe_from_point(middle_points_d_a[i], middle_points_on_a_to_ground[i - 1] - middle_points_d_a[i], 20, 1.4, 3);
-    }
-    
-    angle_to_middle = angle_between(a_to_ground, points_on_d_to_ground[1] - points_on_a_to_ground[1]);
-    
-    translate([points_on_a_to_ground[1].x, points_on_a_to_ground[1].y, points_on_a_to_ground[1].z])
-    rotate([-angle - 11.6, 0, 0])
-    rotate([0, 90 - 6.4, 0])
-        linear_extrude(height = 3, center = true)
-            polygon(points = [[25, 0], [cos(angle_to_middle) * 25, sin(angle_to_middle) * 22], [-22, 0]]);
-
 }
 
 module cylinder_from_point(p, dir, h, r, $fn=64) {
@@ -321,14 +426,14 @@ module cylinder_between(p1, p2, r, $fn=64) {
             cylinder(h = h, r = r);
 }
 
-module pipe_from_point(p, dir, h, ir, or, $fn=64){
+module pipe_from_point(p, dir, h, ir, or, $fn=64) {
     difference(){
         cylinder_from_point(p, dir, h, or);
         cylinder_from_point(p, dir, h, ir);
     }
 }
 
-module pipe_between(p1, p2, ir, or, $fn=64){
+module pipe_between(p1, p2, ir, or, $fn=64) {
     difference(){
         cylinder_between(p1, p2, or);
         cylinder_between(p1, p2, ir);
