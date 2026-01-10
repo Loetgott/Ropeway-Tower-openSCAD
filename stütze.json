@@ -65,6 +65,26 @@
             "floor_count": "3",
             "height": "600",
             "small_rod_diameter": "3"
+        },
+        "Neue Parameter Liste10": {
+            "angle": "15",
+            "angle_on_top": "51",
+            "big_rod_diameter": "5",
+            "draw_construction_helpers": "false",
+            "draw_rods": "false",
+            "floor_count": "3",
+            "height": "600",
+            "small_rod_diameter": "3"
+        },
+        "Neue Parameter Liste11": {
+            "angle": "15",
+            "angle_on_top": "51",
+            "big_rod_diameter": "5",
+            "draw_construction_helpers": "false",
+            "draw_rods": "true",
+            "floor_count": "3",
+            "height": "600",
+            "small_rod_diameter": "3"
         }
     }
 }
