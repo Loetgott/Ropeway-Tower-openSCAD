@@ -277,155 +277,290 @@ color("green")
 module
 vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
 {
-    pipe_from_point(origin,
-                    vec_to_ground,
-                    20,
-                    big_rod_diameter / 2 + 0.2,
-                    big_rod_diameter);
-    pipe_from_point(origin,
-                    -vec_to_ground,
-                    20,
-                    big_rod_diameter / 2 + 0.2,
-                    big_rod_diameter);
-
-    pipe_from_point(
-        origin, a - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-    pipe_from_point(
-        origin, b - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-    pipe_from_point(
-        origin, c - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-    pipe_from_point(
-        origin, d - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-}
-
-module
-horizontal_middle_connector_side(origin, horizont_vec, rot, a, b, c, d)
-{
-    union()
+    difference()
     {
-        pipe_from_point(origin,
-                        horizont_vec,
-                        20,
-                        big_rod_diameter / 2 + 0.2,
-                        big_rod_diameter);
-        pipe_from_point(origin,
-                        -horizont_vec,
-                        20,
-                        big_rod_diameter / 2 + 0.2,
-                        big_rod_diameter);
+        union()
+        {
+            pipe_from_point(origin,
+                            vec_to_ground,
+                            20,
+                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter);
+            pipe_from_point(origin,
+                            -vec_to_ground,
+                            20,
+                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter);
 
-        if (a != undef) {
             pipe_from_point(origin,
                             a - origin,
                             20,
                             small_rod_diameter / 2,
                             small_rod_diameter);
-        }
-
-        if (b != undef) {
             pipe_from_point(origin,
                             b - origin,
                             20,
                             small_rod_diameter / 2,
                             small_rod_diameter);
-        }
-
-        if (c != undef) {
             pipe_from_point(origin,
                             c - origin,
                             20,
                             small_rod_diameter / 2,
                             small_rod_diameter);
-        }
-
-        if (d != undef) {
             pipe_from_point(origin,
                             d - origin,
                             20,
                             small_rod_diameter / 2,
                             small_rod_diameter);
+                            
+            theta_a = atan2(vec_to_ground[1], vec_to_ground[0]) +
+                      angle_between(vec_to_ground, a - origin);
+
+            theta_b = atan2(vec_to_ground[1], vec_to_ground[0]) +
+                      angle_between(vec_to_ground, b - origin);
+
+            theta_c = atan2(vec_to_ground[1], vec_to_ground[0]) +
+                      angle_between(vec_to_ground, c - origin);
+
+            theta_d = atan2(vec_to_ground[1], vec_to_ground[0]) +
+                      angle_between(vec_to_ground, d - origin);
+            
+            translate(origin)
+            {
+                rotate([ -90 - 11.6 - angle, 0, -6.3 ])
+                {
+                    rotate([ 0, 0, 60])
+                    {
+                        linear_extrude(height = 3, center = true)
+                        {
+                            polygon(points = [
+                                [ -20, 0 ],
+                                20 * [ -cos(theta_a), sin(theta_a) ],
+                                [ 20, 0 ],
+                                20 * [ -cos(theta_b), sin(theta_b) ],
+                                
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            translate(origin)
+            {
+                rotate([ 0, 0, 0 ])
+                {
+                    rotate([ 0, 0, 0 ])
+                    {
+                        linear_extrude(height = 3, center = true)
+                        {
+                            polygon(points = [
+                                [ 20, 0 ],
+                                20 * [ cos(theta_c), -sin(theta_c) ],
+                                [ -20, 0 ],
+                                20 * [ cos(theta_d), -sin(theta_d) ],                             
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+        cylinder_from_point(
+            origin, vec_to_ground, 25, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, -vec_to_ground, 25, big_rod_diameter / 2 + 0.2);
+
+        cylinder_from_point(
+            origin, a - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, b - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, c - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, d - origin, 25, small_rod_diameter / 2 + 0.2);
+    }
+}
+
+module
+horizontal_middle_connector_side(origin, horizont_vec, rot, a, b, c, d)
+{
+    difference()
+    {
+        union()
+        {
+            pipe_from_point(origin,
+                            horizont_vec,
+                            20,
+                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter);
+            pipe_from_point(origin,
+                            -horizont_vec,
+                            20,
+                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter);
+
+            if (a != undef) {
+                pipe_from_point(origin,
+                                a - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            if (b != undef) {
+                pipe_from_point(origin,
+                                b - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            if (c != undef) {
+                pipe_from_point(origin,
+                                c - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            if (d != undef) {
+                pipe_from_point(origin,
+                                d - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            theta_a = atan2(horizont_vec[0], horizont_vec[2]) +
+                      angle_between(horizont_vec, a - origin);
+
+            theta_b = atan2(horizont_vec[0], horizont_vec[2]) +
+                      angle_between(horizont_vec, b - origin);
+
+            theta_c = atan2(horizont_vec[0], horizont_vec[2]) +
+                      angle_between(horizont_vec, c - origin);
+
+            theta_d = atan2(horizont_vec[0], horizont_vec[2]) +
+                      angle_between(horizont_vec, d - origin);
+
+            edge_point_list = [
+                [ 20, 0 ],
+                20 * [ cos(theta_a), sin(theta_a) ],
+                20 * [ cos(theta_b), sin(theta_b) ],
+                [ -20, 0 ],
+                20 * [ cos(theta_d), -sin(theta_d) ],
+                20 * [ cos(theta_c), -sin(theta_c) ],
+            ];
+
+            translate(origin) rotate(rot)
+                linear_extrude(height = 3, center = true)
+                    polygon(points = edge_point_list);
         }
 
-        theta_a = atan2(horizont_vec[0], horizont_vec[2]) +
-                  angle_between(horizont_vec, a - origin);
+        cylinder_from_point(
+            origin, horizont_vec, 25, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, -horizont_vec, 25, big_rod_diameter / 2 + 0.2);
 
-        theta_b = atan2(horizont_vec[0], horizont_vec[2]) +
-                  angle_between(horizont_vec, b - origin);
-
-        theta_c = atan2(horizont_vec[0], horizont_vec[2]) +
-                  angle_between(horizont_vec, c - origin);
-
-        theta_d = atan2(horizont_vec[0], horizont_vec[2]) +
-                  angle_between(horizont_vec, d - origin);
-
-        edge_point_list = [
-            [ 20, 0 ],
-            20 * [ cos(theta_a), sin(theta_a) ],
-            20 * [ cos(theta_b), sin(theta_b) ],
-            [ -20, 0 ],
-            20 * [ cos(theta_d), -sin(theta_d) ],
-            20 * [ cos(theta_c), -sin(theta_c) ],
-        ];
-
-        translate(origin) rotate(rot) linear_extrude(height = 3, center = true)
-            polygon(points = edge_point_list);
+        cylinder_from_point(
+            origin, a - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, b - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, c - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, d - origin, 25, small_rod_diameter / 2 + 0.2);
     }
 }
 
 module
 horizontal_middle_connector_front(origin, horizont_vec, rot, a, b, c, d)
 {
-    pipe_from_point(
-        origin, horizont_vec, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(origin,
-                    -horizont_vec,
-                    20,
-                    big_rod_diameter / 2 + 0.2,
-                    big_rod_diameter);
+    difference()
+    {
+        union()
+        {
+            pipe_from_point(origin,
+                            horizont_vec,
+                            20,
+                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter);
+            pipe_from_point(origin,
+                            -horizont_vec,
+                            20,
+                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter);
 
-    if (a != undef) {
-        pipe_from_point(
-            origin, a - origin, 20, small_rod_diameter / 2, small_rod_diameter);
+            if (a != undef) {
+                pipe_from_point(origin,
+                                a - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            if (b != undef) {
+                pipe_from_point(origin,
+                                b - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            if (c != undef) {
+                pipe_from_point(origin,
+                                c - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            if (d != undef) {
+                pipe_from_point(origin,
+                                d - origin,
+                                20,
+                                small_rod_diameter / 2,
+                                small_rod_diameter);
+            }
+
+            theta_a = atan2(horizont_vec[1], horizont_vec[0]) +
+                      angle_between(horizont_vec, a - origin);
+
+            theta_b = atan2(horizont_vec[1], horizont_vec[0]) +
+                      angle_between(horizont_vec, b - origin);
+
+            theta_c = atan2(horizont_vec[1], horizont_vec[0]) +
+                      angle_between(horizont_vec, c - origin);
+
+            theta_d = atan2(horizont_vec[1], horizont_vec[0]) +
+                      angle_between(horizont_vec, d - origin);
+
+            edge_point_list = [
+                [ 20, 0 ],
+                20 * [ cos(theta_a), sin(theta_a) ],
+                20 * [ cos(theta_b), sin(theta_b) ],
+                [ -20, 0 ],
+                20 * [ cos(theta_d), -sin(theta_d) ],
+                20 * [ cos(theta_c), -sin(theta_c) ]
+            ];
+
+            translate(origin) rotate(rot)
+                linear_extrude(height = 3, center = true)
+                    polygon(points = edge_point_list);
+        }
+        cylinder_from_point(
+            origin, horizont_vec, 25, big_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, -horizont_vec, 25, big_rod_diameter / 2 + 0.2);
+
+        cylinder_from_point(
+            origin, a - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, b - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, c - origin, 25, small_rod_diameter / 2 + 0.2);
+        cylinder_from_point(
+            origin, d - origin, 25, small_rod_diameter / 2 + 0.2);
     }
-
-    if (b != undef) {
-        pipe_from_point(
-            origin, b - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-    }
-
-    if (c != undef) {
-        pipe_from_point(
-            origin, c - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-    }
-
-    if (d != undef) {
-        pipe_from_point(
-            origin, d - origin, 20, small_rod_diameter / 2, small_rod_diameter);
-    }
-
-    theta_a = atan2(horizont_vec[1], horizont_vec[0]) +
-              angle_between(horizont_vec, a - origin);
-
-    theta_b = atan2(horizont_vec[1], horizont_vec[0]) +
-              angle_between(horizont_vec, b - origin);
-
-    theta_c = atan2(horizont_vec[1], horizont_vec[0]) +
-              angle_between(horizont_vec, c - origin);
-
-    theta_d = atan2(horizont_vec[1], horizont_vec[0]) +
-              angle_between(horizont_vec, d - origin);
-
-    edge_point_list = [
-        [ 20, 0 ],
-        20 * [ cos(theta_a), sin(theta_a) ],
-        20 * [ cos(theta_b), sin(theta_b) ],
-        [ -20, 0 ],
-        20 * [ cos(theta_d), -sin(theta_d) ],
-        20 * [ cos(theta_c), -sin(theta_c) ]
-    ];
-
-    translate(origin) rotate(rot) linear_extrude(height = 3, center = true)
-        polygon(points = edge_point_list);
 }
 
 module
@@ -456,7 +591,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
 
             translate(origin)
             {
-                rotate([ -90 - 11.6 - angle, 0, 0 ])
+                rotate([ -90 - 11.6 - angle, 0, -6.3 ])
                 {
                     rotate([ 0, 0, -6.4 ])
                     {
