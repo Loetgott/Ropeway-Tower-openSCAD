@@ -160,15 +160,8 @@ if (draw_rods) {
 }
 
 color("green") {
-    // Oberstes "einfaches" Stockwerk
-    for (i = [ a, b, c, d ]) {
-        pipe_from_point(i, dir, 25, 2.51, 5);
-    }
-
-    pipe_from_point(a, a_to_front, 20, 2.51, 5);
-    pipe_from_point(b, b_to_front, 20, 2.51, 5);
-    pipe_from_point(c, c_to_front, 20, 2.51, 5);
-    pipe_from_point(d, d_to_front, 20, 2.51, 5);
+    //top layer connector
+    top_connector();
 
     // Bottom connectors
     ground_connector(a_on_ground,
@@ -273,6 +266,30 @@ color("green") {
     }
 }
 
+module
+top_connector(){
+    for (i = [ a, b, c, d ]) {
+        pipe_from_point(i, dir, 25, 2.51, 5);
+    }
+
+    pipe_from_point(a, a_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(b, b_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(c, c_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(d, d_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    
+    pipe_from_point(a, b - a, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(b, a - b, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(c, d - c, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(d, c - d, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    
+    pipe_between(a, d, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_between(b, c, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    
+    pipe_from_point(a, a_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(b, b_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(c, c_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(d, d_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+}
 
 module
 vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
