@@ -159,9 +159,20 @@ if (draw_rods) {
     }
 }
 
-color("green") {
-    //top layer connector
-    top_connector();
+color("green")
+{
+    // top layer connector
+    top_connector_side();
+    mirror([ 1, 0, 0 ])
+    {
+        top_connector_side();
+    }
+
+    top_connector_front();
+    mirror(cross(dir, [ 1, 0, 0 ]))
+    {
+        top_connector_front();
+    }
 
     // Bottom connectors
     ground_connector(a_on_ground,
@@ -267,28 +278,95 @@ color("green") {
 }
 
 module
-top_connector(){
+top_connector_side()
+{
     for (i = [ a, b, c, d ]) {
         pipe_from_point(i, dir, 25, 2.51, 5);
     }
 
-    pipe_from_point(a, a_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(b, b_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(c, c_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(d, d_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    
+    pipe_from_point(
+        a, a_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(
+        d, d_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+
     pipe_from_point(a, b - a, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
     pipe_from_point(b, a - b, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(c, d - c, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(d, c - d, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    
+
     pipe_between(a, d, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_between(b, c, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    
-    pipe_from_point(a, a_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(b, b_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(c, c_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(d, d_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+
+    pipe_from_point(
+        a, a_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(
+        d, d_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+
+    pipe_from_point(a + (d - a) / 2,
+                    middle_points_on_a_to_ground[0] - (a + (d - a) / 2),
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+    pipe_from_point(a + (d - a) / 2,
+                    middle_points_on_d_to_ground[0] - (a + (d - a) / 2),
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+
+    b_angle = angle_between(
+        c - b, middle_points_on_b_to_ground[0] - (b + (c - b) / 2));
+    c_angle = angle_between(
+        c - b, middle_points_on_c_to_ground[0] - (b + (c - b) / 2));
+
+    edge_point_list = [
+        [ 15, 0 ],
+        20 * [ cos(c_angle), sin(c_angle) ],
+        20 * [ cos(b_angle), sin(b_angle) ],
+        [ -15, 0 ],
+    ];
+
+    translate(b + (c - b) / 2) rotate([ -90 + 6.3, angle, 90 ])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = edge_point_list);
+}
+
+module
+top_connector_front()
+{
+    pipe_from_point(a + (b - a) / 2,
+                    b - a,
+                    15,
+                    big_rod_diameter / 2 + 0.2,
+                    big_rod_diameter);
+    pipe_from_point(a + (b - a) / 2,
+                    a - b,
+                    15,
+                    big_rod_diameter / 2 + 0.2,
+                    big_rod_diameter);
+
+    pipe_from_point(a + (b - a) / 2,
+                    middle_points_on_a_to_ground[0] - (a + (b - a) / 2),
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+    pipe_from_point(a + (b - a) / 2,
+                    middle_points_on_b_to_ground[0] - (a + (b - a) / 2),
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+
+    a_angle = angle_between(
+        b - a, middle_points_on_a_to_ground[0] - (a + (b - a) / 2));
+    b_angle = angle_between(
+        b - a, middle_points_on_b_to_ground[0] - (a + (b - a) / 2));
+
+    edge_point_list = [
+        [ 15, 0 ],
+        20 * [ cos(b_angle), sin(b_angle) ],
+        20 * [ cos(a_angle), sin(a_angle) ],
+        [ -15, 0 ],
+    ];
+
+    translate(a + (b - a) / 2) rotate([ -90 - angle - 11.6, 0, 0 ])
+        linear_extrude(height = 3, center = true)
+            polygon(points = edge_point_list);
 }
 
 module
@@ -329,7 +407,7 @@ vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
                             20,
                             small_rod_diameter / 2,
                             small_rod_diameter);
-                            
+
             a_angle = angle_between(normalize(a - origin), vec_to_ground);
             b_angle = angle_between(normalize(b - origin), vec_to_ground);
             c_angle = angle_between(normalize(c - origin), -vec_to_ground);
@@ -337,27 +415,23 @@ vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
 
             translate(origin)
             {
-                rotate([ -90 - 11.6 - angle, 0, 0])
-                {rotate([0,0,-6.3]){
+                rotate([ -90 - 11.6 - angle, 0, 0 ])
+                {
+                    rotate([ 0, 0, -6.3 ])
+                    {
                         linear_extrude(height = 3, center = true)
                         {
                             polygon(points = [
                                 [ 0, 20 ],
-                                [
-                                    -sin(b_angle) * 20,
-                                    cos(b_angle) * 20
-                                ],
-                                [
-                                    -sin(a_angle) * 20,
-                                    cos(a_angle) * 20
-                                ],                                
+                                [ -sin(b_angle) * 20, cos(b_angle) * 20 ],
+                                [ -sin(a_angle) * 20, cos(a_angle) * 20 ],
                                 [ 0, -20 ],
                             ]);
                         }
-                    }}
-                
+                    }
+                }
             }
-            
+
             translate(origin)
             {
                 rotate([ -angle - 11.6, 0, 0 ])
@@ -368,21 +442,14 @@ vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
                         {
                             polygon(points = [
                                 [ 20, 0 ],
-                                [
-                                    cos(c_angle) * 20,
-                                    sin(c_angle) * 20
-                                ],
-                                [
-                                    cos(d_angle) * 20,
-                                    sin(d_angle) * 20
-                                ],
+                                [ cos(c_angle) * 20, sin(c_angle) * 20 ],
+                                [ cos(d_angle) * 20, sin(d_angle) * 20 ],
                                 [ -20, 0 ]
                             ]);
                         }
                     }
                 }
             }
-            
         }
         cylinder_from_point(
             origin, vec_to_ground, 25, big_rod_diameter / 2 + 0.2);
@@ -619,7 +686,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
 
             translate(origin)
             {
-                rotate([ -90 - 11.6 - angle, 0, 0])
+                rotate([ -90 - 11.6 - angle, 0, 0 ])
                 {
                     rotate([ 0, 0, -6.4 ])
                     {
