@@ -159,8 +159,7 @@ if (draw_rods) {
     }
 }
 
-color("green")
-{
+color("green") {
     // Oberstes "einfaches" Stockwerk
     for (i = [ a, b, c, d ]) {
         pipe_from_point(i, dir, 25, 2.51, 5);
@@ -204,7 +203,7 @@ color("green")
             points_on_a_to_ground[i], a_to_ground, points_on_d_to_ground[i]);
     }
 
-    // vertical middle conenctors
+    // vertical middle conectors
     for (i = [0:floor_count - 2]) {
         vertical_middle_connector(middle_points_on_a_to_ground[i],
                                   a_to_ground,
@@ -274,6 +273,7 @@ color("green")
     }
 }
 
+
 module
 vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
 {
@@ -313,56 +313,59 @@ vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
                             small_rod_diameter / 2,
                             small_rod_diameter);
                             
-            theta_a = atan2(vec_to_ground[1], vec_to_ground[0]) +
-                      angle_between(vec_to_ground, a - origin);
+            a_angle = angle_between(normalize(a - origin), vec_to_ground);
+            b_angle = angle_between(normalize(b - origin), vec_to_ground);
+            c_angle = angle_between(normalize(c - origin), -vec_to_ground);
+            d_angle = angle_between(normalize(d - origin), -vec_to_ground);
 
-            theta_b = atan2(vec_to_ground[1], vec_to_ground[0]) +
-                      angle_between(vec_to_ground, b - origin);
-
-            theta_c = atan2(vec_to_ground[1], vec_to_ground[0]) +
-                      angle_between(vec_to_ground, c - origin);
-
-            theta_d = atan2(vec_to_ground[1], vec_to_ground[0]) +
-                      angle_between(vec_to_ground, d - origin);
+            translate(origin)
+            {
+                rotate([ -90 - 11.6 - angle, 0, 0])
+                {rotate([0,0,-6.3]){
+                        linear_extrude(height = 3, center = true)
+                        {
+                            polygon(points = [
+                                [ 0, 20 ],
+                                [
+                                    -sin(b_angle) * 20,
+                                    cos(b_angle) * 20
+                                ],
+                                [
+                                    -sin(a_angle) * 20,
+                                    cos(a_angle) * 20
+                                ],                                
+                                [ 0, -20 ],
+                            ]);
+                        }
+                    }}
+                
+            }
             
             translate(origin)
             {
-                rotate([ -90 - 11.6 - angle, 0, -6.3 ])
+                rotate([ -angle - 11.6, 0, 0 ])
                 {
-                    rotate([ 0, 0, 60])
-                    {
-                        linear_extrude(height = 3, center = true)
-                        {
-                            polygon(points = [
-                                [ -20, 0 ],
-                                20 * [ -cos(theta_a), sin(theta_a) ],
-                                [ 20, 0 ],
-                                20 * [ -cos(theta_b), sin(theta_b) ],
-                                
-                            ]);
-                        }
-                    }
-                }
-            }
-
-            translate(origin)
-            {
-                rotate([ 0, 0, 0 ])
-                {
-                    rotate([ 0, 0, 0 ])
+                    rotate([ 0, -90 - 6.4, 0 ])
                     {
                         linear_extrude(height = 3, center = true)
                         {
                             polygon(points = [
                                 [ 20, 0 ],
-                                20 * [ cos(theta_c), -sin(theta_c) ],
-                                [ -20, 0 ],
-                                20 * [ cos(theta_d), -sin(theta_d) ],                             
+                                [
+                                    cos(c_angle) * 20,
+                                    sin(c_angle) * 20
+                                ],
+                                [
+                                    cos(d_angle) * 20,
+                                    sin(d_angle) * 20
+                                ],
+                                [ -20, 0 ]
                             ]);
                         }
                     }
                 }
             }
+            
         }
         cylinder_from_point(
             origin, vec_to_ground, 25, big_rod_diameter / 2 + 0.2);
@@ -377,6 +380,14 @@ vertical_middle_connector(origin, vec_to_ground, a, b, c, d)
             origin, c - origin, 25, small_rod_diameter / 2 + 0.2);
         cylinder_from_point(
             origin, d - origin, 25, small_rod_diameter / 2 + 0.2);
+        pipe_from_point(
+            origin + normalize(a - origin) * 20, a - origin, 50, 50);
+        pipe_from_point(
+            origin + normalize(b - origin) * 20, b - origin, 50, 50);
+        pipe_from_point(
+            origin + normalize(c - origin) * 20, c - origin, 50, 50);
+        pipe_from_point(
+            origin + normalize(d - origin) * 20, d - origin, 50, 50);
     }
 }
 
@@ -591,7 +602,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
 
             translate(origin)
             {
-                rotate([ -90 - 11.6 - angle, 0, -6.3 ])
+                rotate([ -90 - 11.6 - angle, 0, 0])
                 {
                     rotate([ 0, 0, -6.4 ])
                     {
