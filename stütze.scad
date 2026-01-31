@@ -290,7 +290,7 @@ top_connector_side()
         d, d_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
 
     pipe_from_point(a, b - a, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(b, a - b, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(d, c - d, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
 
     pipe_between(a, d, big_rod_diameter / 2 + 0.2, big_rod_diameter);
 
@@ -325,6 +325,42 @@ top_connector_side()
     translate(b + (c - b) / 2) rotate([ -90 + 6.3, angle, 90 ])
         rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
             polygon(points = edge_point_list);
+
+    translate(a) rotate([0, angle, 90])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [22, 0],
+                [0, 22]]);
+                
+    translate(d) rotate([angle, 0, 180])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [22, 0],
+                [0, 22]]);
+    
+    translate(d) rotate([0, 90, 0]) rotate([0, 0, 180 - angle])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [25, 0],
+                [0, 25]]);
+                
+    translate(a) rotate([0, 90, 0]) rotate([0, 0, -angle - 270])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [25, 0],
+                [0, 25]]);
+                
+    translate(d) rotate([0, 180, 0]) rotate([-90 + angle, 0, 0])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [22, 0],
+                [0, 22]]);
+                
+    translate(a) rotate([0, 0, 90]) rotate([0, -90+angle, 0])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [22, 0],
+                [0, 22]]);
 }
 
 module
