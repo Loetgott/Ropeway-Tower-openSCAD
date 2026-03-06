@@ -361,6 +361,12 @@ top_connector_side()
             polygon(points = [[0, 0],
                 [22, 0],
                 [0, 22]]);
+                
+     translate([0,0,0]) rotate([0, 0, 0]) rotate([0, 0, 0])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [22, 0],
+                [0, 22]]);
 }
 
 module
