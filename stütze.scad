@@ -30,6 +30,12 @@ function normalize(v) = v / norm(v);
 
 function angle_between(a, b) = acos(dot(a, b) / (norm(a) * norm(b)));
 
+function angle_between_normal(v1, v2, normal) = 
+    atan2(
+        (cross(v1, v2) * normal), // Determinante / Richtung
+        (v1 * v2)                 // Skalarprodukt
+    );
+
 dir = [ 0, height* sin(angle), height* cos(angle) ];
 top_point = dir; // punkt oben in der Mitte
 cross_to_edge = cross([ 50, 0, 0 ], dir);
@@ -362,11 +368,17 @@ top_connector_side()
                 [22, 0],
                 [0, 22]]);
                 
-     translate([0,0,0]) rotate([0, 0, 0]) rotate([0, 0, 0])
+    translate(a) rotate([-angle, 0, 0]) rotate([0, -90 - 6.3, 0])
         rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
             polygon(points = [[0, 0],
-                [22, 0],
-                [0, 22]]);
+                [25 * -cos(11.6), 25 * -sin(11.6)],
+                [0, 25]]);
+                
+    translate(d) rotate([-angle, 0, 0]) rotate([0, -90 - 6.3, 0])
+        rotate([ 0, 0, 0 ]) linear_extrude(height = 3, center = true)
+            polygon(points = [[0, 0],
+                [25 * -cos(11.6), 25 * sin(11.6)],
+                [0, -25]]);
 }
 
 module
@@ -710,7 +722,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
             pipe_from_point(origin - normalize(vec_to_ground) * 20,
                             vec_to_ground,
                             40,
-                            big_rod_diameter / 2 - 0.4,
+                            big_rod_diameter / 2 + 0.2,
                             big_rod_diameter);
             pipe_between(origin - [ 20, 0, 0 ],
                          origin + [ 6, 0, 0 ],
@@ -719,7 +731,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
             pipe_from_point(origin,
                             horizontal_connector - origin,
                             20,
-                            big_rod_diameter / 2 - 0.4,
+                            big_rod_diameter / 2 + 0.2,
                             big_rod_diameter);
 
             angle_to_middle_x = angle_between(a_to_ground, [ 1, 0, 0 ]);
@@ -777,7 +789,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
         cylinder_from_point(origin - normalize(vec_to_ground) * 30,
                             vec_to_ground,
                             60,
-                            big_rod_diameter / 2 - 0.4);
+                            big_rod_diameter / 2 + 0.2);
         cylinder_from_point(origin - normalize(vec_to_ground) * 20,
                             -vec_to_ground,
                             60,
@@ -851,6 +863,19 @@ ground_connector(origin, vec_to_ground, middle_point_1, middle_point_2)
                             50,
                             small_rod_diameter / 2 - 0.2,
                             small_rod_diameter * 1.5);
+                            
+            middle_vec_2 = middle_point_2 - origin;
+            angle_x_1 = angle_between_normal(-vec_to_ground, [0, 0, 1], [0, 1, 0]);
+            angle_x_2 = angle_between_normal(middle_vec_2 , [0, 0, 1], [0, 1, 0]);
+            echo(angle_x_1);
+                            
+            translate(origin) rotate([-angle_between_normal(-vec_to_ground, [0, 1, 0], [1, 0, 0]), 0, 0])
+                linear_extrude(height = 3, center = true)
+                    polygon(points = [[-25, 0],
+                        [50 * -sin(angle_x_1), 50 * cos(angle_x_1)],
+                        [50 * -sin(angle_x_2), 50 * cos(angle_x_2)],
+                        [25, 0]]);
+            
         }
         cylinder_from_point(
             origin, -vec_to_ground, 50, big_rod_diameter / 2 - 0.2);
@@ -956,7 +981,7 @@ threaded_rods()
 }
 
 module
-cylinder_from_point(p, dir, h, r, $fn = 128)
+cylinder_from_point(p, dir, h, r, $fn = 64)
 {
     d = dir / norm(dir); // Richtungsvektor normieren
 
@@ -967,7 +992,7 @@ cylinder_from_point(p, dir, h, r, $fn = 128)
 }
 
 module
-cylinder_between(p1, p2, r, $fn = 128)
+cylinder_between(p1, p2, r, $fn = 64)
 {
     v = p2 - p1;
     h = norm(v);
@@ -979,7 +1004,7 @@ cylinder_between(p1, p2, r, $fn = 128)
 }
 
 module
-pipe_from_point(p, dir, h, ir, or, $fn = 128)
+pipe_from_point(p, dir, h, ir, or, $fn = 64)
 {
     difference()
     {
@@ -990,7 +1015,7 @@ pipe_from_point(p, dir, h, ir, or, $fn = 128)
 }
 
 module
-pipe_between(p1, p2, ir, or, $fn = 128)
+pipe_between(p1, p2, ir, or, $fn = 64)
 {
     difference()
     {
