@@ -180,23 +180,25 @@ color("green")
         top_connector_front();
     }
     
-    ground_connector(b_on_ground,
+    ground_connector_a(b_on_ground,
                      b_to_ground,
                      middle_points_b_c[len(middle_points_b_c) - 1],
                      middle_points_a_b[len(middle_points_a_b) - 1]);
     mirror([1, 0, 0]){
-        ground_connector(b_on_ground,
+        ground_connector_a(b_on_ground,
                      b_to_ground,
                      middle_points_b_c[len(middle_points_b_c) - 1],
                      middle_points_a_b[len(middle_points_a_b) - 1]);
                      }
-    ground_connector(c_on_ground,
+    ground_connector_b(c_on_ground,
                      c_to_ground,
-                     middle_points_c_d[len(middle_points_c_d) - 1],
-                     middle_points_b_c[len(middle_points_b_c) - 1]);
-    ground_connector(d_on_ground,
-                     d_to_ground,
-                     middle_points_d_a[len(middle_points_d_a) - 1],
+                     middle_points_b_c[len(middle_points_b_c) - 1],
+                     middle_points_c_d[len(middle_points_c_d) - 1]);
+                     
+     mirror([1, 0, 0])
+         ground_connector_b(c_on_ground,
+                     c_to_ground,
+                     middle_points_b_c[len(middle_points_b_c) - 1],
                      middle_points_c_d[len(middle_points_c_d) - 1]);
 
     // Main connectors
@@ -842,7 +844,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
 }
 
 module
-ground_connector(origin, vec_to_ground, middle_point_1, middle_point_2)
+ground_connector_a(origin, vec_to_ground, middle_point_1, middle_point_2)
 {
     difference()
     {
@@ -885,6 +887,64 @@ ground_connector(origin, vec_to_ground, middle_point_1, middle_point_2)
                     polygon(points = [[-25, 0],
                         [50 * -sin(angle_x_4), 50 * cos(angle_x_4)],
                         [50 * -sin(angle_x_3 - 8), 50 * cos(angle_x_3 - 8)],
+                        [25, 0]]);
+        }
+        cylinder_from_point(
+            origin, -vec_to_ground, 50, big_rod_diameter / 2 - 0.2);
+        cylinder_from_point(
+            origin + normalize(vec_to_ground) * 50, -vec_to_ground, 60, big_rod_diameter / 2 - 0.2);
+        cylinder_from_point(
+            origin, middle_point_1 - origin, 50, small_rod_diameter / 2 - 0.2);
+        cylinder_from_point(
+            origin, middle_point_2 - origin, 50, small_rod_diameter / 2 - 0.2);
+        cylinder_from_point(origin - [0, 0, 50], [0, 0, 1], 50, 25);
+    }
+}
+
+module
+ground_connector_b(origin, vec_to_ground, middle_point_1, middle_point_2)
+{
+    difference()
+    {
+        union()
+        {
+            cylinder_from_point(origin, [ 0, 0, -1 ], 5, 25);
+            pipe_from_point(origin,
+                            -vec_to_ground,
+                            50,
+                            big_rod_diameter / 2 - 0.2,
+                            big_rod_diameter * 1.5);
+            pipe_from_point(origin,
+                            middle_point_1 - origin,
+                            50,
+                            small_rod_diameter / 2 - 0.2,
+                            small_rod_diameter * 1.5);
+            pipe_from_point(origin,
+                            middle_point_2 - origin,
+                            50,
+                            small_rod_diameter / 2 - 0.2,
+                            small_rod_diameter * 1.5);
+                            
+            middle_vec_1 = middle_point_1 - origin;
+            middle_vec_2 = middle_point_2 - origin;
+            angle_x_1 = angle_between_normal(-vec_to_ground, [0, 0, 1], [0, 1, 0]);
+            angle_x_2 = angle_between_normal(middle_vec_2 , [0, 0, 1], [0, 1, 0]);
+            angle_x_3 = angle_between_normal(-vec_to_ground, [0, 0, 1], [1, 0, 0]);
+            angle_x_4 = angle_between_normal(middle_vec_1 , [0, 0, 1], [1, 0, 0]);
+            echo(angle_x_1);
+                            
+            translate(origin) rotate([-angle_between_normal(-vec_to_ground, [0, 1, 0], [1, 0, 0]), 0, 0])
+                linear_extrude(height = 3, center = true)
+                    polygon(points = [[-25, 0],
+                        [50 * -sin(angle_x_1 + 8), 50 * cos(angle_x_1 + 8)],
+                        [50 * -sin(angle_x_2), 50 * cos(angle_x_2)],
+                        [25, 0]]);
+                        
+            translate(origin) rotate([0, 0, -92]) rotate([90 - 6.3, 0, 0])
+                linear_extrude(height = 3, center = true)
+                    polygon(points = [[-25, 0],
+                        [50 * -sin(angle_x_3 + 8), 50 * cos(angle_x_3 + 8)],
+                        [50 * -sin(angle_x_4), 50 * cos(angle_x_4)],
                         [25, 0]]);
         }
         cylinder_from_point(
