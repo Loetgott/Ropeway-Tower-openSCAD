@@ -1077,6 +1077,8 @@ module threaded_rods() {
         cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i], 1.5);
     }
     echo("==================================================");
+    echo(str("Bodenpunkte: ", "x: ", round(a_on_ground.x) * 2, " y: ", round(c_on_ground.y - b_on_ground.y)));
+    echo("==================================================");
 }
 
 module
