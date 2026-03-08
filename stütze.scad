@@ -873,7 +873,6 @@ ground_connector_a(origin, vec_to_ground, middle_point_1, middle_point_2)
             angle_x_2 = angle_between_normal(middle_vec_2 , [0, 0, 1], [0, 1, 0]);
             angle_x_3 = angle_between_normal(-vec_to_ground, [0, 0, 1], [1, 0, 0]);
             angle_x_4 = angle_between_normal(middle_vec_1 , [0, 0, 1], [1, 0, 0]);
-            echo(angle_x_1);
                             
             translate(origin) rotate([-angle_between_normal(-vec_to_ground, [0, 1, 0], [1, 0, 0]), 0, 0])
                 linear_extrude(height = 3, center = true)
@@ -898,6 +897,10 @@ ground_connector_a(origin, vec_to_ground, middle_point_1, middle_point_2)
         cylinder_from_point(
             origin, middle_point_2 - origin, 50, small_rod_diameter / 2 - 0.2);
         cylinder_from_point(origin - [0, 0, 50], [0, 0, 1], 50, 25);
+        cylinder_from_point(origin - [15 * sin(45),15 * cos(45), 0], [0, 0, 1], 6, 1.6);
+        cylinder_from_point(origin - [15 * sin(45),15 * -cos(45), 0], [0, 0, 1], 6, 1.6);
+        cylinder_from_point(origin - [15 * -sin(45),15 * cos(45), 0], [0, 0, 1], 6, 1.6);
+        cylinder_from_point(origin - [15 * -sin(45),15 * -cos(45), 0], [0, 0, 1], 6, 1.6);
     }
 }
 
@@ -931,7 +934,6 @@ ground_connector_b(origin, vec_to_ground, middle_point_1, middle_point_2)
             angle_x_2 = angle_between_normal(middle_vec_2 , [0, 0, 1], [0, 1, 0]);
             angle_x_3 = angle_between_normal(-vec_to_ground, [0, 0, 1], [1, 0, 0]);
             angle_x_4 = angle_between_normal(middle_vec_1 , [0, 0, 1], [1, 0, 0]);
-            echo(angle_x_1);
                             
             translate(origin) rotate([-angle_between_normal(-vec_to_ground, [0, 1, 0], [1, 0, 0]), 0, 0])
                 linear_extrude(height = 3, center = true)
@@ -956,101 +958,125 @@ ground_connector_b(origin, vec_to_ground, middle_point_1, middle_point_2)
         cylinder_from_point(
             origin, middle_point_2 - origin, 50, small_rod_diameter / 2 - 0.2);
         cylinder_from_point(origin - [0, 0, 50], [0, 0, 1], 50, 25);
+        cylinder_from_point(origin - [15 * sin(45),15 * cos(45), 0], [0, 0, 1], 6, 1.6);
+        cylinder_from_point(origin - [15 * sin(45),15 * -cos(45), 0], [0, 0, 1], 6, 1.6);
+        cylinder_from_point(origin - [15 * -sin(45),15 * cos(45), 0], [0, 0, 1], 6, 1.6);
+        cylinder_from_point(origin - [15 * -sin(45),15 * -cos(45), 0], [0, 0, 1], 6, 1.6);
     }
 }
 
-module
-threaded_rods()
-{
-    for (p = [ a, b, c, d ]) {
+// Hilfsfunktion für eine saubere Tabellenoptik in der Konsole
+module log_line(typ, anzahl, laenge, info) {
+    echo(str(" ", typ, " | ", anzahl, " | ", laenge, "mm | ", info));
+}
+
+module threaded_rods() {
+    echo(" ");
+    echo("==================================================");
+    echo("       ZUSCHNITTLISTE GEWINDESTANGEN             ");
+    echo("=================================================");
+    echo("TYP | ANZ | LÄNGE | POSITION                    ");
+    echo("----|-----|-------|------------------------------");
+
+    // --- 1. HAUPTSTANGEN ---
+    for (p = [a, b, c, d]) {
         cylinder_from_point(p, dir, 80, 2.5);
     }
-
-    cylinder_between(a, b, 2.5);
-    cylinder_between(a, d, 2.5);
-    cylinder_between(b, c, 2.5);
-    cylinder_between(d, c, 2.5);
-
-    cylinder_between(a + dir / norm(dir) * 80, b + dir / norm(dir) * 80, 2.5);
-    cylinder_between(a + dir / norm(dir) * 80, d + dir / norm(dir) * 80, 2.5);
-    cylinder_between(b + dir / norm(dir) * 80, c + dir / norm(dir) * 80, 2.5);
-    cylinder_between(d + dir / norm(dir) * 80, c + dir / norm(dir) * 80, 2.5);
-
-    cylinder_from_point(a, a_to_front, 80, 2.5);
-    cylinder_from_point(b, b_to_front, 80, 2.5);
-    cylinder_from_point(c, c_to_front, 80, 2.5);
-    cylinder_from_point(d, d_to_front, 80, 2.5);
+    
+    let(h1 = round(norm(a_on_ground - a)) - 5,
+        h2 = round(norm(c_on_ground - c)) - 5) {
+        log_line("M5", "2 x", h1, "Hauptstangen A/B");
+        log_line("M5", "2 x", h2, "Hauptstangen C/D");
+    }
 
     cylinder_between(a, a_on_ground, 2.5);
     cylinder_between(b, b_on_ground, 2.5);
     cylinder_between(c, c_on_ground, 2.5);
     cylinder_between(d, d_on_ground, 2.5);
 
-    for (i = [0:len(points_on_a_to_ground) - 2]) {
-        cylinder_between(
-            points_on_a_to_ground[i], points_on_b_to_ground[i], 2.5);
-        cylinder_between(
-            points_on_b_to_ground[i], points_on_c_to_ground[i], 2.5);
-        cylinder_between(
-            points_on_c_to_ground[i], points_on_d_to_ground[i], 2.5);
-        cylinder_between(
-            points_on_d_to_ground[i], points_on_a_to_ground[i], 2.5);
+    // --- 2. VERBINDER & FRONT ---
+    let(offset = dir / norm(dir) * 80) {
+        cylinder_between(a + offset, b + offset, 2.5);
+        cylinder_between(a + offset, d + offset, 2.5);
+        cylinder_between(b + offset, c + offset, 2.5);
+        cylinder_between(d + offset, c + offset, 2.5);
     }
 
-    cylinder_between(
-        middle_points_a_b[0], middle_points_on_a_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_a_b[0], middle_points_on_b_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_b_c[0], middle_points_on_b_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_b_c[0], middle_points_on_c_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_c_d[0], middle_points_on_c_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_c_d[0], middle_points_on_d_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_d_a[0], middle_points_on_d_to_ground[0], 1.5);
-    cylinder_between(
-        middle_points_d_a[0], middle_points_on_a_to_ground[0], 1.5);
+    cylinder_from_point(a, a_to_front, 80, 2.5);
+    cylinder_from_point(b, b_to_front, 80, 2.5);
+    cylinder_from_point(c, c_to_front, 80, 2.5);
+    cylinder_from_point(d, d_to_front, 80, 2.5);
 
-    for (i = [1:floor_count - 1]) {
-        cylinder_between(
-            middle_points_a_b[i], middle_points_on_a_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_a_b[i], middle_points_on_b_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_a_b[i], middle_points_on_a_to_ground[i], 1.5);
-        cylinder_between(
-            middle_points_a_b[i], middle_points_on_b_to_ground[i], 1.5);
+    // --- 3. STOCKWERKE WAAGERECHT ---
+    echo("----|-----|-------|------------------------------");
+    for (i = [0 : len(points_on_a_to_ground) - 2]) {
+        let(l_ab = round(norm(points_on_a_to_ground[i] - points_on_b_to_ground[i])) + 20,
+            l_cb = round(norm(points_on_c_to_ground[i] - points_on_b_to_ground[i])) - 5) {
+            
+            log_line("M5", "2 x", l_ab, str("S", i, " waagerecht A-B/C-D"));
+            log_line("M5", "2 x", l_cb, str("S", i, " waagerecht B-C/D-A"));
+        }
 
-        cylinder_between(
-            middle_points_b_c[i], middle_points_on_b_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_b_c[i], middle_points_on_c_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_b_c[i], middle_points_on_b_to_ground[i], 1.5);
-        cylinder_between(
-            middle_points_b_c[i], middle_points_on_c_to_ground[i], 1.5);
-
-        cylinder_between(
-            middle_points_c_d[i], middle_points_on_c_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_c_d[i], middle_points_on_d_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_c_d[i], middle_points_on_c_to_ground[i], 1.5);
-        cylinder_between(
-            middle_points_c_d[i], middle_points_on_d_to_ground[i], 1.5);
-
-        cylinder_between(
-            middle_points_d_a[i], middle_points_on_d_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_d_a[i], middle_points_on_a_to_ground[i - 1], 1.5);
-        cylinder_between(
-            middle_points_d_a[i], middle_points_on_d_to_ground[i], 1.5);
-        cylinder_between(
-            middle_points_d_a[i], middle_points_on_a_to_ground[i], 1.5);
+        // Geometrie waagerecht
+        let(vec = normalize(points_on_a_to_ground[i] - points_on_b_to_ground[i])) {
+            cylinder_between(points_on_a_to_ground[i] + 10 * vec, points_on_b_to_ground[i] - 10 * vec, 2.5);
+            cylinder_between(points_on_b_to_ground[i], points_on_c_to_ground[i], 2.5);
+            cylinder_between(points_on_c_to_ground[i] - 10 * vec, points_on_d_to_ground[i] + 10 * vec, 2.5);
+            cylinder_between(points_on_d_to_ground[i], points_on_a_to_ground[i], 2.5);
+        }
     }
+
+    // --- 4. VERSTEIFUNGEN (STOCKWERK 0) ---
+    echo("----|-----|-------|------------------------------");
+    let(v0_ab = round(norm(middle_points_a_b[0] - middle_points_on_a_to_ground[0])) - 10,
+        v0_bc = round(norm(middle_points_b_c[0] - middle_points_on_b_to_ground[0])) - 10) {
+        
+        log_line("M3", "4 x", v0_ab, "S0 X-Streben A-B/C-D");
+        log_line("M3", "4 x", v0_bc, "S0 X-Streben B-C/D-A");
+    }
+
+    cylinder_between(middle_points_a_b[0], middle_points_on_a_to_ground[0], 1.5);
+    cylinder_between(middle_points_a_b[0], middle_points_on_b_to_ground[0], 1.5);
+    cylinder_between(middle_points_b_c[0], middle_points_on_b_to_ground[0], 1.5);
+    cylinder_between(middle_points_b_c[0], middle_points_on_c_to_ground[0], 1.5);
+    cylinder_between(middle_points_c_d[0], middle_points_on_c_to_ground[0], 1.5);
+    cylinder_between(middle_points_c_d[0], middle_points_on_d_to_ground[0], 1.5);
+    cylinder_between(middle_points_d_a[0], middle_points_on_d_to_ground[0], 1.5);
+    cylinder_between(middle_points_d_a[0], middle_points_on_a_to_ground[0], 1.5);
+
+    // --- 5. VERSTEIFUNGEN (RESTE) ---
+    for (i = [1 : floor_count - 1]) {
+        let(l_ab_u = round(norm(middle_points_a_b[i] - middle_points_on_a_to_ground[i - 1])),
+            l_ab_o = round(norm(middle_points_a_b[i] - middle_points_on_a_to_ground[i])) - 10,
+            l_bc_u = round(norm(middle_points_b_c[i] - middle_points_on_b_to_ground[i - 1])),
+            l_bc_o = round(norm(middle_points_b_c[i] - middle_points_on_b_to_ground[i])) - 10) {
+            
+            log_line("M3", "4 x", l_ab_u, str("S", i, " X-unten A-B/C-D"));
+            log_line("M3", "4 x", l_ab_o, str("S", i, " X-oben A-B/C-D"));
+            log_line("M3", "4 x", l_bc_u, str("S", i, " X-unten B-C/D-A"));
+            log_line("M3", "4 x", l_bc_o, str("S", i, " X-oben B-C/D-A"));
+        }
+
+        // Geometrie (i)
+        cylinder_between(middle_points_a_b[i], middle_points_on_a_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_a_b[i], middle_points_on_b_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_a_b[i], middle_points_on_a_to_ground[i], 1.5);
+        cylinder_between(middle_points_a_b[i], middle_points_on_b_to_ground[i], 1.5);
+        // ... (analog für BC, CD, DA)
+        cylinder_between(middle_points_b_c[i], middle_points_on_b_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_b_c[i], middle_points_on_c_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_b_c[i], middle_points_on_b_to_ground[i], 1.5);
+        cylinder_between(middle_points_b_c[i], middle_points_on_c_to_ground[i], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_c_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_d_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_c_to_ground[i], 1.5);
+        cylinder_between(middle_points_c_d[i], middle_points_on_d_to_ground[i], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_d_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i-1], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_d_to_ground[i], 1.5);
+        cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i], 1.5);
+    }
+    echo("==================================================");
 }
 
 module
