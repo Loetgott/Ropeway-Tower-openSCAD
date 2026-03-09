@@ -287,8 +287,9 @@ color("green")
 }
 
 module
-top_connector_side()
-{
+top_connector_side() {
+    difference() {
+        union(){
     for (i = [ a, b, c, d ]) {
         pipe_from_point(i, dir, 25, 2.51, 5);
     }
@@ -382,11 +383,22 @@ top_connector_side()
             polygon(points = [[0, 0],
                 [25 * -cos(11.6), 25 * sin(11.6)],
                 [0, -25]]);
+    }
+    cylinder_between(a + 10 * a - b, b - 10 * a - b, 2.6);
+    cylinder_between(a, b, 2.6);
+    cylinder_between(c - 10 * a - b, d + 10 * a - b, 2.6);
+    cylinder_between(c, d, 2.6);
+    
+    cylinder_between(a + (d - a) / 2, middle_points_on_a_to_ground[0], 1.6);
+    cylinder_between(a + (d - a) / 2, middle_points_on_d_to_ground[0], 1.6);
+    }
 }
 
 module
 top_connector_front()
 {
+difference(){
+union(){
     pipe_from_point(a + (b - a) / 2,
                     b - a,
                     15,
@@ -424,6 +436,11 @@ top_connector_front()
     translate(a + (b - a) / 2) rotate([ -90 - angle - 11.6, 0, 0 ])
         linear_extrude(height = 3, center = true)
             polygon(points = edge_point_list);
+    }
+    cylinder_between(a, b, 2.6);
+    cylinder_between(a + (b - a) / 2, middle_points_on_a_to_ground[0], 1.6);
+    cylinder_between(a + (b - a) / 2, middle_points_on_b_to_ground[0], 1.6);
+    }
 }
 
 module
