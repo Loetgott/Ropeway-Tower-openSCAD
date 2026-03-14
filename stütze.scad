@@ -427,6 +427,30 @@ union(){
                     20,
                     small_rod_diameter / 2 + 0.2,
                     small_rod_diameter);
+                    
+    pipe_from_point(a + (b - a) / 2,
+                    a + normalize(a_to_front) * 93 - a + (b - a) / 2,
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+    pipe_from_point(a + (b - a) / 2,
+                    (a + normalize(dir) * 78) - a + (b - a) / 2,
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+    
+    mirror([1, 0, 0]){
+        pipe_from_point(a + (b - a) / 2,
+                    a + normalize(a_to_front) * 93 - a + (b - a) / 2,
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+        pipe_from_point(a + (b - a) / 2,
+                    (a + normalize(dir) * 78) - a + (b - a) / 2,
+                    20,
+                    small_rod_diameter / 2 + 0.2,
+                    small_rod_diameter);
+    }
 
     a_angle = angle_between(
         b - a, middle_points_on_a_to_ground[0] - (a + (b - a) / 2));
@@ -1004,7 +1028,7 @@ module threaded_rods() {
 
     // --- 1. HAUPTSTANGEN ---
     for (p = [a, b, c, d]) {
-        cylinder_from_point(p, dir, 80, 2.5);
+        cylinder_from_point(p, dir, 78.6, 2.5);
     }
     
     let(h1 = round(norm(a_on_ground - points_on_a_to_ground[len(points_on_a_to_ground) - 2])) - 10,
@@ -1026,12 +1050,25 @@ module threaded_rods() {
         cylinder_between(a + offset, d + offset, 2.5);
         cylinder_between(b + offset, c + offset, 2.5);
         cylinder_between(d + offset, c + offset, 2.5);
+        
+        cylinder_between(a , d + offset, small_rod_diameter / 2);
+        cylinder_between(b , c + offset, small_rod_diameter / 2);
     }
 
-    cylinder_from_point(a, a_to_front, 80, 2.5);
-    cylinder_from_point(b, b_to_front, 80, 2.5);
-    cylinder_from_point(c, c_to_front, 80, 2.5);
-    cylinder_from_point(d, d_to_front, 80, 2.5);
+    cylinder_from_point(a, a_to_front, 93, 2.5);
+    cylinder_from_point(b, b_to_front, 93, 2.5);
+    cylinder_from_point(c, c_to_front, 93, 2.5);
+    cylinder_from_point(d, d_to_front, 93, 2.5);
+    
+    cylinder_between(a + (b - a) / 2, a + normalize(a_to_front) * 93, small_rod_diameter / 2);
+    cylinder_between(b + (a - b) / 2, b + normalize(b_to_front) * 93, small_rod_diameter / 2);
+    cylinder_between(c + (d - c) / 2, c + normalize(c_to_front) * 93, small_rod_diameter / 2);
+    cylinder_between(d + (c - d) / 2, d + normalize(d_to_front) * 93, small_rod_diameter / 2);
+    
+    cylinder_between(a + (b - a) / 2, a + normalize(dir) * 78, small_rod_diameter / 2);
+    cylinder_between(b + (a - b) / 2, b + normalize(dir) * 78, small_rod_diameter / 2);
+    cylinder_between(c + (d - c) / 2, c + normalize(dir) * 78, small_rod_diameter / 2);
+    cylinder_between(d + (c - d) / 2, d + normalize(dir) * 78, small_rod_diameter / 2);
 
     // --- 3. STOCKWERKE WAAGERECHT ---
     echo("----|-----|-------|------------------------------");
