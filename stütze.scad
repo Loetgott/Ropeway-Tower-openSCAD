@@ -295,19 +295,19 @@ top_connector_side() {
     }
 
     pipe_from_point(
-        a, a_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+        a, a_to_front, 20, big_rod_diameter / 2 - 0.2, big_rod_diameter);
     pipe_from_point(
-        d, d_to_front, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+        d, d_to_front, 20, big_rod_diameter / 2 - 0.2, big_rod_diameter);
 
-    pipe_from_point(a, b - a, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
-    pipe_from_point(d, c - d, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+    pipe_from_point(a, b - a, 20, big_rod_diameter / 2 - 0.2, big_rod_diameter);
+    pipe_from_point(d, c - d, 20, big_rod_diameter / 2 - 0.2, big_rod_diameter);
 
     pipe_between(a, d, big_rod_diameter / 2 + 0.2, big_rod_diameter);
 
     pipe_from_point(
-        a, a_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+        a, a_to_ground, 20, big_rod_diameter / 2 - 0.2, big_rod_diameter);
     pipe_from_point(
-        d, d_to_ground, 20, big_rod_diameter / 2 + 0.2, big_rod_diameter);
+        d, d_to_ground, 20, big_rod_diameter / 2 - 0.2, big_rod_diameter);
 
     pipe_from_point(a + (d - a) / 2,
                     middle_points_on_a_to_ground[0] - (a + (d - a) / 2),
@@ -384,13 +384,20 @@ top_connector_side() {
                 [25 * -cos(11.6), 25 * sin(11.6)],
                 [0, -25]]);
     }
-    cylinder_between(a + 10 * a - b, b - 10 * a - b, 2.6);
     cylinder_between(a, b, 2.6);
-    cylinder_between(c - 10 * a - b, d + 10 * a - b, 2.6);
     cylinder_between(c, d, 2.6);
     
-    cylinder_between(a + (d - a) / 2, middle_points_on_a_to_ground[0], 1.6);
-    cylinder_between(a + (d - a) / 2, middle_points_on_d_to_ground[0], 1.6);
+    #cylinder_from_point(a + (d - a) / 2, middle_points_on_a_to_ground[0] - (a + (d - a) / 2), 60, 1.6);
+    #cylinder_from_point(a + (d - a) / 2, middle_points_on_d_to_ground[0] - (a + (d - a) / 2), 50, 1.6);
+    
+    cylinder_from_point(a, dir, 50, big_rod_diameter - 0.2);
+    cylinder_from_point(d, dir, 50, big_rod_diameter - 0.2);
+    
+    cylinder_from_point(a, a_to_ground, 50, big_rod_diameter / 2 - 0.2);
+    cylinder_from_point(d, d_to_ground, 50, big_rod_diameter / 2 - 0.2);
+    
+    cylinder_from_point(a + 20 * normalize(a_to_ground), a_to_ground, 50, big_rod_diameter * 2);
+    cylinder_from_point(d + 20 * normalize(d_to_ground), d_to_ground, 50, big_rod_diameter * 2);
     }
 }
 
@@ -742,16 +749,16 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
             pipe_from_point(origin - normalize(vec_to_ground) * 20,
                             vec_to_ground,
                             40,
-                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter / 2 - 0.4,
                             big_rod_diameter);
             pipe_between(origin - [ 20, 0, 0 ],
                          origin + [ 6, 0, 0 ],
-                         big_rod_diameter / 2 + 0.2,
+                         big_rod_diameter / 2 - 0.4,
                          big_rod_diameter);
             pipe_from_point(origin,
                             horizontal_connector - origin,
                             20,
-                            big_rod_diameter / 2 + 0.2,
+                            big_rod_diameter / 2 - 0.4,
                             big_rod_diameter);
 
             angle_to_middle_x = angle_between(a_to_ground, [ 1, 0, 0 ]);
@@ -809,7 +816,7 @@ main_connector_a(origin, vec_to_ground, horizontal_connector)
         cylinder_from_point(origin - normalize(vec_to_ground) * 30,
                             vec_to_ground,
                             60,
-                            big_rod_diameter / 2 + 0.2);
+                            big_rod_diameter / 2 - 0.2);
         cylinder_from_point(origin - normalize(vec_to_ground) * 20,
                             -vec_to_ground,
                             60,
@@ -1000,10 +1007,12 @@ module threaded_rods() {
         cylinder_from_point(p, dir, 80, 2.5);
     }
     
-    let(h1 = round(norm(a_on_ground - a)) - 5,
-        h2 = round(norm(c_on_ground - c)) - 5) {
+    let(h1 = round(norm(a_on_ground - points_on_a_to_ground[len(points_on_a_to_ground) - 2])) - 10,
+        h2 = round(norm(c_on_ground - points_on_c_to_ground[len(points_on_c_to_ground) - 2])) - 10,
+        h3 = round(norm(points_on_a_to_ground[len(points_on_a_to_ground) - 3] - points_on_a_to_ground[len(points_on_a_to_ground) - 2])) - 10) {
         log_line("M5", "2 x", h1, "Hauptstangen A/B");
         log_line("M5", "2 x", h2, "Hauptstangen C/D");
+        log_line("M5", str((floor_count - 1) * 4, " x"), h3, "Hauptstangen jedes Stockwerk");
     }
 
     cylinder_between(a, a_on_ground, 2.5);
@@ -1028,10 +1037,10 @@ module threaded_rods() {
     echo("----|-----|-------|------------------------------");
     for (i = [0 : len(points_on_a_to_ground) - 2]) {
         let(l_ab = round(norm(points_on_a_to_ground[i] - points_on_b_to_ground[i])) + 20,
-            l_cb = round(norm(points_on_c_to_ground[i] - points_on_b_to_ground[i])) - 5) {
+            l_cb = round(norm(points_on_c_to_ground[i] - points_on_b_to_ground[i]))) {
             
             log_line("M5", "2 x", l_ab, str("S", i, " waagerecht A-B/C-D"));
-            log_line("M5", "2 x", l_cb, str("S", i, " waagerecht B-C/D-A"));
+            log_line("M5", "2 x", l_cb - 5, str("S", i, " waagerecht B-C/D-A | Lochabstand: ", l_cb - 24));
         }
 
         // Geometrie waagerecht
@@ -1048,8 +1057,8 @@ module threaded_rods() {
     let(v0_ab = round(norm(middle_points_a_b[0] - middle_points_on_a_to_ground[0])) - 10,
         v0_bc = round(norm(middle_points_b_c[0] - middle_points_on_b_to_ground[0])) - 10) {
         
-        log_line("M3", "4 x", v0_ab, "S0 X-Streben A-B/C-D");
-        log_line("M3", "4 x", v0_bc, "S0 X-Streben B-C/D-A");
+        log_line("M3", "2 x", v0_ab, "S0 X-Streben A-B/C-D");
+        log_line("M3", "2 x", v0_bc, "S0 X-Streben B-C/D-A");
     }
 
     cylinder_between(middle_points_a_b[0], middle_points_on_a_to_ground[0], 1.5);
@@ -1068,10 +1077,10 @@ module threaded_rods() {
             l_bc_u = round(norm(middle_points_b_c[i] - middle_points_on_b_to_ground[i - 1])),
             l_bc_o = round(norm(middle_points_b_c[i] - middle_points_on_b_to_ground[i])) - 10) {
             
-            log_line("M3", "4 x", l_ab_u, str("S", i, " X-unten A-B/C-D"));
+            /*log_line("M3", "4 x", l_ab_u, str("S", i, " X-unten A-B/C-D"));
             log_line("M3", "4 x", l_ab_o, str("S", i, " X-oben A-B/C-D"));
             log_line("M3", "4 x", l_bc_u, str("S", i, " X-unten B-C/D-A"));
-            log_line("M3", "4 x", l_bc_o, str("S", i, " X-oben B-C/D-A"));
+            log_line("M3", "4 x", l_bc_o, str("S", i, " X-oben B-C/D-A"));*/
         }
 
         // Geometrie (i)
@@ -1094,7 +1103,7 @@ module threaded_rods() {
         cylinder_between(middle_points_d_a[i], middle_points_on_a_to_ground[i], 1.5);
     }
     echo("==================================================");
-    echo(str("Bodenpunkte: ", "x: ", round(a_on_ground.x) * 2, " y: ", round(c_on_ground.y - b_on_ground.y)));
+    echo(str("Bodenpunkte: ", "x1: ", round(a_on_ground.x) * 2,  " x2: ", round(d_on_ground.x) * 2, " y: ", round(c_on_ground.y - b_on_ground.y)));
     echo("==================================================");
 }
 
