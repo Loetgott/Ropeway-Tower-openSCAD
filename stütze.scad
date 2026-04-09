@@ -413,6 +413,44 @@ top_connector_side() {
                 [0, 25]]);
                 
     }
+    cylinder_from_point(a + normalize(dir) * 15, [1, 0, 0], 40, 1);
+    cylinder_from_point(a + normalize(dir) * 15, [-1, 0, 0], 6, 1);
+    cylinder_from_point(d + normalize(dir) * 15, [1, 0, 0], 40, 1);
+    cylinder_from_point(d + normalize(dir) * 15, [-1, 0, 0], 6, 1);
+    
+    cylinder_from_point(a + normalize(a_to_front) * 15, [1, 0, 0], 40, 1);
+    cylinder_from_point(a + normalize(a_to_front) * 15, [-1, 0, 0], 6, 1);
+    cylinder_from_point(d + normalize(d_to_front) * 15, [1, 0, 0], 40, 1);
+    cylinder_from_point(d + normalize(d_to_front) * 15, [-1, 0, 0], 6, 1);
+    
+    translate(a + normalize(dir) * 15 + [6.5, 0, 0 ]) {
+            rotate([-angle, 0, 0 ])
+            {
+                cube([ 4, 4, 4 ], center = true);
+            }
+        }
+        
+    translate(d + normalize(dir) * 15 + [6.5, 0, 0 ]) {
+            rotate([-angle, 0, 0 ])
+            {
+                cube([ 4, 4, 4 ], center = true);
+            }
+        }    
+    
+    translate(a + normalize(a_to_front) * 15 + [6.5, 0, 0 ]) {
+            rotate([angle_between(a_to_front, [0, 0, 1]), 0, 0 ])
+            {
+                cube([ 4, 4, 4 ], center = true);
+            }
+        }
+        
+    translate(d + normalize(d_to_front) * 15 + [6.5, 0, 0 ]) {
+            rotate([-angle_between(d_to_front, [0, 0, 1]), 0, 0 ])
+            {
+                cube([ 4, 4, 4 ], center = true);
+            }
+        }
+        
     cylinder_between(a, b, big_rod_diameter / 2 + 0.2);
     cylinder_between(c, d, big_rod_diameter / 2 + 0.2);
     
